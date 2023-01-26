@@ -1,0 +1,366 @@
+<div id="allSection">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">เอกสารจัดส่ง</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header">
+          <b><i class="fa-solid fa-file-export"></i> ข้อมูลรายการส่งเอกสาร</b>
+
+          <!-- <button class="btn custom-add-btn btn-sm ml-2 float-right"
+            (click)="openNewModalAdd(newContent); clearData(); isEdited = false">
+            <i class="fa-solid fa-plus"></i> เพิ่ม
+          </button>
+          <button class="btn custom-print-btn btn-sm ml-2 float-right" [disabled]="checkDisableBtn()"
+            (click)="openModalQrCode(qrcode)">
+            <i class="fa-solid fa-barcode"></i> ปริ้นท์บาร์โค้ด
+          </button> -->
+          <div style="display: flex; justify-content: end">
+            <form class="form-inline" [formGroup]="myForm">
+              <label class="card-title">วันเริ่มต้น : </label>
+              &nbsp;
+              <input formControlName="startAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+                [(ngModel)]="dateStart" ngbDatepicker #d="ngbDatepicker" [placement]="placement" />
+              <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"><i
+                  class="fas fa-calendar-week"></i></button>
+              &nbsp;
+
+              <label class="card-title">วันสิ้นสุด : </label>
+              &nbsp;
+              <input formControlName="endAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+                [(ngModel)]="dateEnd" ngbDatepicker #d2="ngbDatepicker" [placement]="placement" />
+              <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button">
+                <i class="fas fa-calendar-week"></i>
+              </button>
+              &nbsp;
+              <!-- <pre>{{dateStart | json}}</pre>
+              <pre>{{dateEnd | json}}</pre> -->
+            </form>
+          </div>
+          <br />
+          <div style="display: flex; justify-content: end">
+            <form class="form-inline">
+              &nbsp;
+              <label class="card-title">ค้นหาเอกสาร : </label>
+              &nbsp;
+              <input type="search" class="form-control rounded" placeholder="หมายเลขเอกสาร, ชื่อ-สกุล, หน่วยงาน" />
+              &nbsp;
+              <button class="btn btn-primary" (click)="getUserPagination()"><i class="fas fa-search"></i></button>
+            </form>
+          </div>
+          <br />
+          <div style="display: flex; justify-content: end">
+            <form class="form-inline">
+              <button class="btn custom-edit-btn" (click)="sendOutDocument()"><i class="fas fa-truck-fast"></i>
+                ส่งออกเอกสาร</button>
+            </form>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+              <thead>
+                <tr class="bg-teal">
+                  <th scope="col"><input type="checkbox" (change)="checkAll()" [(ngModel)]="ngCheckAllItem" /> เลือก
+                  </th>
+                  <th scope="col">#</th>
+                  <th scope="col">หมายเลขเอกสาร</th>
+                  <th scope="col">หัวเรื่อง</th>
+                  <th scope="col">เอกสารสำเร็จ</th>
+                  <th scope="col">บัญชีผู้นำเข้าระบบ</th>
+                  <th scope="col">ประเภท</th>
+                  <th scope="col">หน่วยงานปลายทาง</th>
+                  <th scope="col">ปี เดือน วัน</th>
+                  <th scope="col">ใช้เวลาไปแล้ว</th>
+                  <th scope="col" class="text-center">เครื่องมือ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of resPaginationDocumentHistory.resData.datas; let i = index">
+                  <td>
+                    <input type="checkbox" class="form-group" [(ngModel)]="item.checked" (click)="checkUnCheck(i)" />
+                  </td>
+                  <td>
+                    {{ i + 1 }}
+                  </td>
+                  <td>{{ item.governmentDocNo }}</td>
+                  <td>{{ item.currentRouting + '/' +item.totalRouting}}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.user.firstName + ' ' + item.user.lastName }}</td>
+                  <td>
+                    <span class="badge custom-edit-btn"> {{ item.documentType | typeDocument }}</span>
+                  </td>
+                  <td>{{ item.agencyRecipientName }}</td>
+                  <td>{{ item.createdAt | dateFormat1 }}</td>
+                  <td>{{ item.calFromNow }}</td>
+                  <td class="text-center">
+                    <button class="btn custom-tracking-btn btn-sm ml-2" (click)="openHistory(history, item.barcode,i)"
+                      ngbTooltip="ประวัติเส้นทาง">
+                      <i class="fas fa-business-time"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="resPaginationDocumentHistory.resData.datas.length !== 0" style="padding: 20px">
+              <ngb-pagination [collectionSize]="resPaginationDocumentHistoryData.totalPages * 10"
+                [(page)]="reqPaginationDocumentHistory.page" [maxSize]="10" [boundaryLinks]="true"
+                (pageChange)="getUserPagination()"></ngb-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- add  document -->
+  <!-- <ng-template #newContent let-modal>
+    <div class="modal-header bg-custom-add">
+      <h4 class="modal-title" id="modal-basic-title">เพิ่มเอกสาร</h4>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row" *ngIf="!isEdited">
+        <div class="col-12 form-group" style="display: flex; justify-content: end">
+          <div class="form-inline">
+            <label>จำนวนข้อมูลที่ต้องการเพิ่ม: </label>
+            &nbsp;
+            <input type="number" class="form-control rounded" [(ngModel)]="indexCountDoc" />
+            &nbsp;
+            <button class="btn btn-success bg-g-success" (click)="addDocumentArray(indexCountDoc)">
+              <i class="fa fa-plus" style="font-size: 15px" aria-hidden="true"></i>
+              เพิ่ม
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngFor="let item of formDocument; let i1 = index">
+        <div class="shadow-sm p-3 mb-3">
+          <div class="row">
+            <div class="col-12">
+              <label class="btn btn-primary">ลำดับที่ {{ i1 + 1 }}</label>
+              <button *ngIf="formDocument.length > 1" (click)="deleteListDocument(i1)"
+                class="btn btn-danger float-right">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-4 form-group">
+              <label>หมายเลขเอกสาร: </label>
+              <input type="text" [(ngModel)]="item.governmentDocNo" class="form-control"
+                [ngClass]="item.governmentDocNo ? 'is-valid' : 'is-invalid'" />
+              <div class="invalid-feedback">หมายเลขเอกสาร</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label>หัวเรื่อง: </label>
+              <input type="text" [(ngModel)]="item.name" class="form-control"
+                [ngClass]="item.name ? 'is-valid' : 'is-invalid'" />
+              <div class="invalid-feedback">หัวเรื่อง</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label>หน่วยงานปลายทาง: </label>
+              <select class="form-control" [(ngModel)]="item.agencyIdRecipient" aria-label="Default select example"
+                [ngClass]="item.agencyIdRecipient ? 'is-valid' : 'is-invalid'">
+                <ng-container *ngIf="agencyAll.length > 0">
+                  <option *ngFor="let itemAgency of agencyAll; let ia = index" [value]="itemAgency.id">
+                    {{ itemAgency.agencyName }}
+                  </option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">หน่วยงานปลายทาง</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label>ประเภท: </label>
+              <select class="form-control" [(ngModel)]="item.documentType" aria-label="Default select example"
+                [ngClass]="item.documentType ? 'is-valid' : 'is-invalid'">
+                <ng-container *ngIf="documentType.length > 0">
+                  <option *ngFor="let itemDocType of documentType; let i = index" [value]="itemDocType.value">
+                    {{ itemDocType.name }}
+                  </option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">ประเภท</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label for="">ระดับความสำคัญ:</label>
+              <select [(ngModel)]="item.priority" class="form-control"
+                [ngClass]="item.priority ? 'is-valid' : 'is-invalid'">
+                <ng-container *ngIf="priorityOption.length > 0">
+                  <option *ngFor="let itemPriorityOption of priorityOption; let i = index"
+                    [value]="itemPriorityOption.value">
+                    {{ itemPriorityOption.name }}
+                  </option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">ระดับความสำคัญ</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label for="">การอนุมัติ:</label>
+              <select [(ngModel)]="item.isApprove" class="form-control"
+                [ngClass]="item.isApprove !== null ? 'is-valid' : 'is-invalid'">
+                <option value="true">ต้องอนุมัติ</option>
+                <option value="false">ไม่ต้องอนุมัติ</option>
+              </select>
+              <div class="invalid-feedback">การอนุมัติ</div>
+            </div>
+
+            <div class="col-4 form-group">
+              <label for="">สถานะเริ่มต้นเอกสาร:</label>
+              <select [(ngModel)]="item.isStatusSendOut" class="form-control"
+                [ngClass]="item.isApprove !== null ? 'is-valid' : 'is-invalid'">
+                <option value="1">สร้างเอกสาร</option>
+                <option value="2">ส่งเอกสารไปยังหน่วยงานปลายทาง</option>
+              </select>
+              <div class="invalid-feedback">การอนุมัติ</div>
+            </div>
+
+            <div class="col-8 form-group">
+              <label>หมายเหตุ: </label>
+              <textarea class="form-control" [(ngModel)]="item.detail" cols="30" rows="3"></textarea>
+            </div>
+          </div>
+
+          <hr />
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label>แนบไฟล์</label>
+              <button class="btn btn-success float-right" (click)="addFileInputImg(i1)">เพิ่มไฟล์</button>
+            </div>
+
+            <ng-container *ngFor="let file of item.files; let i2 = index">
+              <div class="col-2" *ngIf="!file.isDelete && file.id">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-12">
+                        <div class="float-right">
+                          <i class="fas fa-download mr-3"></i>
+                          <a [href]="file.value" target="_blank" class="btn btn-border" download="fileName.pdf">
+                            <i class="fa-solid fa-x" (click)="file.isDelete = true"></i>
+                          </a>
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <img src="assets/img/img-file.png" width="100%" />
+                      </div>
+                      <div class="col-12 mt-2 mr-1 text-center" style="font-size: 12px">
+                        <p>{{ file.nameFile }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngFor="let file of item.files; let i2 = index">
+              <div class="col-12 mt-3" style="display: flex" *ngIf="!file.isDelete && !file.id">
+                <div class="col-12" style="display: flex">
+                  <div class="input-group">
+                    <div class="custom-file">
+                      <input type="file" class="custom-file-input" (change)="handleFileInputImg($event, i1, i2)" />
+
+                      <label class="custom-file-label">{{ file.nameFile ? file.nameFile : 'เลือกไฟล์' }} </label>
+                    </div>
+                  </div>
+                  <button class="btn btn-danger btn-sm ml-1 float-right">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-success" [disabled]="checkInput()" (click)="onSubmitTemplateBased()">
+        {{ isEdited ? 'อัพเดท' : 'บันทึก' }}
+      </button>
+    </div>
+  </ng-template> -->
+
+  <!-- <ng-template #viewContent let-modal>
+    <div class="modal-header bg-custom-view">
+      <h4 class="modal-title" id="modal-basic-title">ตรวจสอบเอกสาร</h4>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <app-view-detail-doc [documentId]="documentDataPaging.datas[this.indexView].id"></app-view-detail-doc>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-success" (click)="modal.dismiss('Cross click')"
+        [disabled]="false">ปิด</button>
+    </div>
+  </ng-template> -->
+
+  <!-- <ng-template #qrcode let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">ปริ้นท์บาร์โค้ด</h4>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss()"><i
+          class="fa-solid fa-x"></i></button>
+    </div>
+    <div class="modal-body" id="qrcode" style="max-height: 70vh; overflow: scroll">
+      <ng-container *ngFor="let item of barcode; let i = index">
+        <table class="table table-hover text-nowrap">
+          <thead>
+            <tr class="bg-teal text-center">
+              <th scope="col">#</th>
+              <th scope="col">{{ item.name ? item.name : '' }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center">
+              <td class="align-middle">{{ i + 1 }}</td>
+              <td class="align-middle"><img [id]="'barcode' + i" /><br /></td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn custom-info-btn" (click)="printBarcode()"><i class="fas fa-print"></i>
+        ปริ้นท์</button>
+    </div>
+  </ng-template> -->
+
+  <ng-template #history let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title"><i class="fas fa-business-time"></i> ลำดับเหตุการณ์</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body" style="height:70vh;overflow:auto">
+      <app-document-routing-list [routingList]="documentRoutingList">
+      </app-document-routing-list>
+
+    </div>
+    <div class="modal-footer">
+      <div class="row">
+        <div class="btn-group">
+          <button class="btn btn-danger" (click)="close()">ปิด</button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

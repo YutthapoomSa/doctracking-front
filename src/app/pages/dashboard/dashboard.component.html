@@ -1,0 +1,159 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">ภาพรวม</h1>
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <!-- Small boxes (Stat box) -->
+
+    <div class="row form-group">
+
+      <div class="col-10">
+        <div class="row">
+
+          <div class="col-lg-4 col-md-6 col-sm-6">
+            <label>หน่วยงาน: </label>
+            <ng-select2 [(ngModel)]="reqDocumentSummary.agencyId" width="100%" [options]="optionsSelect2"
+              [data]="agencys" class="form-group"> </ng-select2>
+          </div>
+          <div class="col-lg-4 col-md-6 col-sm-6">
+            <label>วันที่เริ่มต้น: </label>
+            <div class="input-group">
+              <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="reqDocumentSummary.startAt"
+                ngbDatepicker #sDP="ngbDatepicker">
+              <button class="btn btn-outline-secondary" (click)="sDP.toggle()" type="button">
+                <i class="fa-solid fa-calendar-days"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 col-sm-6">
+            <label>วันที่สิ้นสุด: </label>
+            <div class="input-group">
+              <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="reqDocumentSummary.endAt"
+                ngbDatepicker #eDP="ngbDatepicker">
+              <button class="btn btn-outline-secondary" (click)="eDP.toggle()" type="button">
+                <i class="fa-solid fa-calendar-days"></i>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="col-2">
+        <div class="row" style="position: absolute; bottom: 0px; width: 100%;">
+
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <button (click)="getDocumentSummary()" [disabled]="reqDocumentSummary.agencyId.length === 0"
+              class="btn btn-outline-success" style="width: 100%;" type="button">
+              ค้นหา <i class="fas fa-search"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4 col-6">
+        <!-- small box -->
+        <div class="small-box custom-btn">
+          <div class="inner">
+            <h3>{{resDocumentSummary.summaryAll.total}}</h3>
+
+            <p>ทั้งหมด</p>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-file"></i>
+          </div>
+          <a href="#" class="small-box-footer description-box">รายละเอียด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-6">
+        <!-- small box -->
+        <div class="small-box custom-warning-font-color">
+          <div class="inner">
+            <h3>{{resDocumentSummary.summaryAll.processing}}</h3>
+
+            <p>อยู่ระหว่างดำเนินการ</p>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <a href="#" class="small-box-footer description-box"> รายละเอียด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+
+      <div class="col-lg-4 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success" (click)="openModalPaginationDoc(paginationDoc, ['success'])">
+          <div class="inner">
+            <h3>{{resDocumentSummary.summaryAll.success}}</h3>
+            <!-- <sup style="font-size: 20px">%</sup> -->
+
+            <p>เสร็จสิ้น</p>
+          </div>
+          <div class="icon">
+            <i class="fa-solid fa-check"></i>
+          </div>
+          <a href="#" class="small-box-footer description-box">รายละเอียด <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+
+      <!-- ./col -->
+    </div>
+
+
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <b><i class="fa-solid fa-chart-area"></i> กราฟ</b>
+          </div>
+          <div class="card-body ">
+            <div style="width: 100%;">
+              <canvas baseChart [chartType]="'line'" [legend]="true" [labels]="chartLabels" [datasets]="chartData"
+                [options]="chartOptions">
+              </canvas>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- Main row -->
+</section>
+<!-- /.content -->
+
+<ng-template #paginationDoc let-modal let-c="close">
+  <div class="modal-header ">
+    <h4 class="modal-title " id="modal-basic-title">
+      ข้อมูลเอกสาร
+    </h4>
+
+    <button type="button" (click)="c('close')" class="btn btn-close" aria-label="Close"><i
+        class="fa-solid fa-x"></i></button>
+  </div>
+  <div class="modal-body text-center">
+
+    <app-pagination-document-summary [agencyId]="bodyDocumentSummary.agencyId" [startAt]="bodyDocumentSummary.startAt"
+      [endAt]="bodyDocumentSummary.endAt" [status]="isStatus"></app-pagination-document-summary>
+
+  </div>
+</ng-template>

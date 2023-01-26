@@ -1,0 +1,97 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">คลังเอกสาร</h1>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card card-outline card-primary">
+      <div class="card-header">
+        <input type="text" class="form-control" placeholder="ค้นหา" (keyup)="loadPaginationArchive($event)">
+      </div>
+      <div class="card-body table-responsive">
+        <table class="table table-hover text-nowrapss">
+          <thead class="bg-teal">
+            <tr>
+              <th>#</th>
+              <th>หมายเลขเอกสาร</th>
+              <th>ชื่อ</th>
+              <!-- <th>รายละเอียดเอกสาร</th> -->
+              <th>ประเภท</th>
+              <th>ระดับความสำคัญ</th>
+              <th>สำเร็จแล้ว</th>
+              <th>วันที่</th>
+              <th>เครื่องมือ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngIf="datArchiveDocument.datas.length > 0">
+              <tr *ngFor="let item of datArchiveDocument.datas;let i = index">
+                <td style="width:50px">{{i+1}}</td>
+                <td>{{item.governmentDocNo}}</td>
+                <td>{{item.name}}</td>
+                <!-- <td style="width:500px">
+                  <p>{{item.detail}} Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Voluptates, inventore odio vel est reiciendis similique eveniet sed suscipit aperiam numquam
+                    doloribus
+                    enim impedit optio magni omnis repellendus ipsa voluptatibus laboriosam consequatur deleniti
+                    excepturi
+                    fugiat, molestias ipsam! Esse placeat aliquid error consectetur optio deleniti, ex, provident fugiat
+                    molestiae saepe quam cum.</p>
+                </td> -->
+                <td>
+                  <span *ngIf="item.documentType === 'เอกสารภายใน'"
+                    class="badge custom-edit-btn">{{item.documentType}}</span>
+                  <span *ngIf="item.documentType === 'เอกสารภายนอก'"
+                    class="badge custom-external-btn">{{item.documentType}}</span>
+                </td>
+                <td>{{item.priority}}</td>
+                <td>{{item.currentRouting + '/' + item.totalRouting}}</td>
+                <td>{{item.createdAt}}</td>
+                <td>
+                  <button class="btn custom-tracking-btn" (click)="openHistory(history, item.barcode)">
+                    <i class="fas fa-business-time"></i>
+                  </button>
+                </td>
+              </tr>
+            </ng-container>
+            <ng-container *ngIf="datArchiveDocument.datas.length === 0">
+              <tr>
+                <td colspan="8" style="text-align:center">ไม่พบเอกสารในคลัง</td>
+              </tr>
+            </ng-container>
+
+          </tbody>
+        </table>
+
+        <ngb-pagination [collectionSize]="datArchiveDocument.totalPages * 10" [(page)]="reqPagingArchiveDocument.page"
+          [maxSize]="5" [boundaryLinks]="true" (pageChange)="loadPaginationArchive()">
+
+        </ngb-pagination>
+      </div>
+      <div class="card-footer"></div>
+    </div>
+  </div>
+</section>
+
+<ng-template #history let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title"><i class="fas-business-time">ลำดับเหตุการณ์</i></h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross Click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" style="height:70vh;overflow:auto">
+    <app-document-routing-list [routingList]="resFindOneDocumentHistoryForTimeLine"></app-document-routing-list>
+  </div>
+  <div class="modal-footer">
+    <div class="row">
+      <button class="btn btn-danger" (click)="modal.dismiss('Cross click')">ปิด</button>
+    </div>
+  </div>
+</ng-template>

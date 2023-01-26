@@ -1,0 +1,335 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">จัดการบัญชีผู้ใช้</h1>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <b><i class="fa-solid fa-users"></i> ข้อมูลบัญชีผู้ใช้</b>
+
+        <ng-container *ngIf="userDetail.role === 'manager'">
+
+        </ng-container>
+        <ng-container *ngIf="userDetail.role !== 'manager'">
+          <button class="btn custom-add-btn btn-sm ml-2 float-right" (click)="openModelAdd(addOrUpdate)">
+            <i class="fa-solid fa-plus"></i> เพิ่ม
+          </button>
+        </ng-container>
+
+      </div>
+      <div class="card-body">
+        <div class="card-body table-responsive p-0">
+          <div class="row" style="padding-left: 20px; padding-bottom: 5px;">
+
+            <div class="col-8">
+              <table>
+                <tbody>
+                  <tr>
+                    <td>
+                      total: {{resUserPagination && resUserPagination.resData && resUserPagination.resData.totalItems ?
+                      resUserPagination.resData.totalItems : 0}} |
+                    </td>
+                    <td>
+                      <select (change)="getUserPagination()" [(ngModel)]="reqUserPagination.perPages"
+                        class="form-control" style="width: 70px;">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="col-4">
+              <div class="card-tools">
+                <div class="input-group input-group-sm">
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <input (keyup)="getUserPagination()" [(ngModel)]="reqUserPagination.search" type="text"
+                    name="table_search" class="form-control float-right" placeholder="ค้นหา"
+                    style="border-radius: 5px" />
+
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-default shadow-none">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <table class="table table-hover text-nowrap">
+            <thead>
+              <tr class="bg-teal">
+                <th>#</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>เบอร์โทรศัพท์</th>
+                <th>สิทธิ์การเข้าถึง</th>
+                <th>หน่วยงานที่รับผิดชอบ</th>
+                <th class="text-center">เครื่องมือ</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="haveUserPagingDatas">
+              <tr *ngFor="let item of resUserPagination.resData.datas;let i = index">
+                <td>{{((reqUserPagination.page - 1) * reqUserPagination.perPages) + (1 + i)}}</td>
+                <td>{{item.firstName}}</td>
+                <td>{{item.lastName}}</td>
+                <td>{{item.phoneNumber}}</td>
+                <td>{{item.role}}</td>
+                <td>{{item.userAgencyLists[0] ? item.userAgencyLists[0].agency.agencyName : ""}}</td>
+                <!-- change to agency-->
+                <td class="text-center">
+                  <button class="btn custom-edit-btn btn-sm ml-2" (click)="openModelEdited(addOrUpdate,item.id)"><i
+                      class="fas fa-pen-to-square"></i></button>
+                  <!-- <button class="btn custom-info-btn btn-sm ml-2" (click)="openModalShowPassword(contentPassword,i)"><i
+                      class="fas fa-key"></i></button> -->
+                  <button class="btn btn-danger btn-sm ml-2" (click)="delete(item.id)">
+                    <i class="fas fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="!haveUserPagingDatas">
+              <tr>
+                <td colspan="7" style="text-align: center;">
+                  <p>ไม่พบข้อมูล</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <ngb-pagination [collectionSize]="resUserPagination.resData.totalPages * 10" [(page)]="reqUserPagination.page"
+            [maxSize]="5" [boundaryLinks]="true" (pageChange)="haveUserPagingDatas = false; getUserPagination()">
+          </ngb-pagination>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</section>
+
+
+
+<ng-template #addOrUpdate let-modal let-c="close">
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="!isEdit">เพิ่มบัญชีผู้ใช้</h4>
+    <h4 class="modal-title" id="modal-basic-title" *ngIf="isEdit">แก้ไขบัญชีผู้ใช้</h4>
+    <button type="button" (click)="c('close')" class="btn btn-close" aria-label="Close">
+      <i class="fa-solid fa-x"></i>
+    </button>
+  </div>
+  <form class="form-group" [formGroup]="myForm" (ngSubmit)="onSubmitTemplateBased()">
+
+    <div class="modal-body">
+
+      <div class="row form-group">
+        <div class="col-6">
+          <label>ชื่อ: <span style="color: red;">*</span></label>
+          <input type="text" [(ngModel)]="reqUsersRegister.firstName" class="form-control" formControlName="firstName">
+
+          <div
+            *ngIf="myForm.controls['firstName'].invalid && (myForm.controls['firstName'].dirty || myForm.controls['firstName'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['firstName'].errors.required">
+              firstName is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <label>นามสกุล: <span style="color: red;">*</span></label>
+          <input type="text" [(ngModel)]="reqUsersRegister.lastName" class="form-control" formControlName="lastName">
+
+          <div
+            *ngIf="myForm.controls['lastName'].invalid && (myForm.controls['lastName'].dirty || myForm.controls['lastName'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['lastName'].errors.required">
+              lastName is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row form-group">
+        <div class="col-6">
+          <label>เพศ: <span style="color: red;">*</span></label>
+          <select class="form-control" [(ngModel)]="reqUsersRegister.gender" formControlName="gender"
+            aria-label="Default select example">
+            <option value=""></option>
+            <option *ngFor="let item of gender;" value="{{item.data}}">{{item.name}}</option>
+          </select>
+
+          <div
+            *ngIf="myForm.controls['gender'].invalid && (myForm.controls['gender'].dirty || myForm.controls['gender'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['gender'].errors.required ">
+              gender is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <label>email: <span style="color: red;">*</span></label>
+          <input type="email" [(ngModel)]="reqUsersRegister.email" class="form-control" formControlName="email">
+
+          <div
+            *ngIf="myForm.controls['email'].invalid && (myForm.controls['email'].dirty || myForm.controls['email'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['email'].errors.required || myForm.controls['email'].invalid">
+              email is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row form-group">
+        <div class="col-12">
+          <label>เบอร์โทรศัพท์: <span style="color: red;">*</span></label>
+          <input type="tel" [(ngModel)]="reqUsersRegister.phoneNumber" class="form-control" maxlength="10"
+            formControlName="tel">
+
+          <div
+            *ngIf="myForm.controls['tel'].invalid && (myForm.controls['tel'].dirty || myForm.controls['tel'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['tel'].errors.required">
+              tel is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row form-group">
+        <div class="col-6">
+          <label>ชื่อผู้ใช้: <span style="color: red;">*</span></label>
+          <input type="text" [(ngModel)]="reqUsersRegister.username" class="form-control" formControlName="userName">
+
+          <div
+            *ngIf="myForm.controls['userName'].invalid && (myForm.controls['userName'].dirty || myForm.controls['userName'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['userName'].errors.required">
+              userName is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <label>รหัสผ่าน:
+            <span *ngIf="reqUsersRegister.id === '' || reqUsersRegister.id === null" style="color: red;">*</span>
+          </label>
+          <input type="text" [(ngModel)]="reqUsersRegister.password" class="form-control" formControlName="password">
+
+          <div
+            *ngIf="myForm.controls['password'].invalid && (myForm.controls['password'].dirty || myForm.controls['password'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['password'].errors.required">
+              tel is required.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row form-group">
+        <div class="col-6">
+          <label>สิทธิ์การเข้าถึง: <span style="color: red;">*</span></label>
+          <select class="form-control" [(ngModel)]="reqUsersRegister.role" formControlName="role"
+            aria-label="Default select example">
+            <option value=""></option>
+            <option *ngFor="let item of role;" value="{{item.data}}">{{item.name}}</option>
+          </select>
+
+          <div
+            *ngIf="myForm.controls['role'].invalid && (myForm.controls['role'].dirty || myForm.controls['role'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['role'].errors.required">
+              role is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <label>หน่วยงานที่รับผิดชอบ: <span style="color: red;">*</span></label>
+          <!-- <ng-select2 [(ngModel)]="reqUsersRegister.agencyIds" [options]="optionsSelect2" [data]="agencys"
+            [width]="'300'" class="form-group" formControlName="department"> </ng-select2> -->
+          <select class="form-control" [(ngModel)]="reqUsersRegister.agencyId" formControlName="department"
+            aria-label="Default select example" (ngModelChange)="selectMainAgency($event)">
+            <option value=""></option>
+            <option *ngFor="let item of allAgency;" value="{{item.id}}">{{item.agencyName}}</option>
+          </select>
+
+          <!-- <select class="form-control" [(ngModel)]="reqUsersRegister.agencyId" formControlName="department">
+            <ng-container>
+              <option value=""></option>
+            </ng-container>
+          </select> -->
+
+          <div
+            *ngIf="myForm.controls['department'].invalid && (myForm.controls['department'].dirty || myForm.controls['department'].touched)"
+            class="alert alert-danger">
+            <div *ngIf="myForm.controls['department'].errors.required">
+              department is required.
+            </div>
+          </div>
+        </div>
+        <div class="col-6" style="padding-top: 5px;">
+          <label>หน่วยงานย่อย ที่รับผิดชอบ: <span style="color: red; "></span></label>
+          <select class="form-control" [(ngModel)]="reqUsersRegister.agencySecondaryId" formControlName="department"
+            aria-label="Default select example">
+            <option value=""></option>
+            <option *ngFor="let item of allAgencySecondary;" value="{{item.id}}">{{item.agencyName}}</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <div class="row" style="width: 100%;">
+        <div class="col-6">
+          <button type="submit" (click)="c('close')" class="btn btn-success float-right" [disabled]="!myForm.valid">
+            บันทึก
+          </button>
+        </div>
+        <div class="col-6">
+          <button type="button" class="btn btn-danger float-left" (click)="c('close')">
+            ย้อนกลับ
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+</ng-template>
+
+<ng-template #contentPassword let-modal let-c="close">
+  <div class="modal-header ">
+    <h4 class="modal-title " id="modal-basic-title">ข้อมูลบัญชีผู้ใช้</h4>
+    <button type="button" (click)="c('close')" class="btn btn-close" aria-label="Close"><i
+        class="fa-solid fa-x"></i></button>
+  </div>
+  <div class="modal-body text-center">
+
+    <form class="form-group" [formGroup]="userForm" (ngSubmit)="onSubmitUserBased()">
+      <div class="row">
+        <div class="col">
+          <label>ชื่อผู้ใช้ : <label>{{userForm.controls.userName.value}}</label></label>
+          <br />
+          <label>รหัสผ่าน : <label>{{userForm.controls.password.value}}</label></label>
+
+
+        </div>
+      </div>
+
+    </form>
+
+
+
+  </div>
+</ng-template>

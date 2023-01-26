@@ -1,0 +1,193 @@
+<!-- timeline -->
+<div class="row m-0">
+  <div class="col-sm-12 col-md-12 col-ls-12 p-0">
+    <div class="timeline">
+      <div class="time-label">
+        <span class="btn-success"><i class="fas fa-calendar-week"></i> เหตุการณ์</span>
+      </div>
+      <ng-container *ngIf="routingList">
+        <ng-container *ngIf="routingList.length > 0">
+          <ng-container *ngFor="let item of routingList;let ir = index">
+            <div>
+              <i class="fas fa-angle-double-down custom-edit-btn"></i>
+              <div class="timeline-item">
+                <div class="timeline-header d-flex justify-content-between" style="cursor:pointer"
+                  (click)="openCollapse(ir)">
+                  <div>
+                    <ng-container *ngIf="!item.isCollapse">
+                      <i class="fas fa-chevron-down" style="padding-right:10px"></i>
+                    </ng-container>
+                    <ng-container *ngIf="item.isCollapse">
+                      <i class="fas fa-chevron-up" style="padding-right:10px"></i>
+                    </ng-container>
+                    <i class="fas fa-clock" style="color: #676fa3"></i>
+                    <span> เส้นทางที่ {{ir+1}}</span> <span style="padding-left:10px;color:rgb(127,196,35)"
+                      *ngIf="item.isSuccess">(สำเร็จแล้ว)</span><span style="padding-left:10px;color:rgb(255, 217, 0)"
+                      *ngIf="!item.isSuccess">(กำลังกำเดินการ)</span>
+                    <br>
+                    <br>
+                    <span style="padding-left: 25px">{{ item.createdAt | dateFormat1 }}</span>
+                    <hr>
+                    <table class="table table-bordered">
+                      <tr>
+                        <th>หน่วยงานหลักจากผู้ส่ง</th>
+                        <td>{{item.agencySenderName}}</td>
+                      </tr>
+                      <tr>
+                        <th></th>
+                        <td>(หน่วยงานย่อย) - {{item.agencySecondarySenderName ? item.agencySecondarySenderName : ''}}
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>หน่วยงานหลักจากผู้รับ</th>
+                        <td>{{item.agencyRecipientName}}</td>
+                      </tr>
+                      <tr>
+                        <th></th>
+                        <td>(หน่วยงานย่อย) -
+                          {{item.agencySecondaryRecipientName ? item.agencySecondaryRecipientName : ''}}</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div>
+                    <span class="badge badge-info">{{ item.status }}</span>
+                  </div>
+                </div>
+                <ng-container *ngIf="item.isCollapse">
+                  <div class="timeline-body bg-light-blue">
+                    <div *ngFor="let itemHistory of item.docHistoryLists;let idh = index">
+                      <div class="card">
+                        <!-- <div class="card-body">
+                          ชื่อผู้ใช้ : {{itemHistory.user.firstName + ' ' + itemHistory.user.lastName}}
+
+                          <hr>
+                          หมายเหตุ : {{itemHistory.comment ? itemHistory.comment:'-'}}
+                        </div> -->
+                      </div>
+                      <div class="card">
+                        <!-- <div class="card-body">
+                          ชื่อหน่วยงานที่ส่ง :
+                          <ng-container *ngIf="itemHistory.agencySender">
+                            {{itemHistory.agencySender.agencyName ?
+                            itemHistory.agencySender.agencyName:'-'}}
+                          </ng-container>
+                          <hr>
+                          ชื่อย่อ :
+                          <ng-container *ngIf="itemHistory.agencySender">
+                            {{itemHistory.agencySender.abbreviationName ?
+                            itemHistory.agencySender.abbreviationName:'-'}}
+                          </ng-container>
+                          <br>
+                          code :
+                          <ng-container *ngIf="itemHistory.agencySender">
+                            {{itemHistory.agencySender.agencyCode ?
+                            itemHistory.agencySender.agencyCode:'-'}}
+                          </ng-container>
+
+                        </div> -->
+                        <!-- <div class="card-footer">
+                          หน่วยงานย่อย
+                          <hr>
+                          ชื่อย่อ :
+                          <ng-container *ngIf="itemHistory.agencySecondarySender">
+                            {{itemHistory.agencySecondarySender.abbreviationName ?
+                            itemHistory.agencySecondarySender.abbreviationName:'-'}}
+                          </ng-container>
+                          <br>
+                          code :
+                          <ng-container *ngIf="itemHistory.agencySecondarySender">
+                            {{itemHistory.agencySecondarySender.agencyCode ?
+                            itemHistory.agencySecondarySender.agencyCode:'-'}}
+                          </ng-container>
+                        </div> -->
+
+                        <div class="card-body">
+                          <div class="row">
+                            <div class="col-9">
+                              <i class="fas fa-clock" style="color: #676fa3"></i>
+                              <span> {{itemHistory.createdAt | dateFormat1}}</span>
+                              <span> [ {{itemHistory.abbreviationName}} ]
+                                {{itemHistory.comment ? itemHistory.comment : '-'}}</span>
+                            </div>
+                            <div class="col-3 text-right">
+                              <span class="badge badge-info">
+                                {{itemHistory.status}}
+                              </span>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </div>
+
+                      <!-- <div class="card">
+                        <div class="card-body">
+                          ชื่อหน่วยงานที่รับ :
+                          <ng-container *ngIf="itemHistory.agencyRecipient">
+                            {{itemHistory.agencyRecipient.agencyName ?
+                            itemHistory.agencyRecipient.agencyName:'-'}}
+                          </ng-container>
+                          <hr>
+                          ชื่อย่อ :
+                          <ng-container *ngIf="itemHistory.agencyRecipient">
+                            {{itemHistory.agencyRecipient.abbreviationName ?
+                            itemHistory.agencyRecipient.abbreviationName:'-'}}
+                          </ng-container>
+                          <br>
+                          code :
+                          <ng-container *ngIf="itemHistory.agencyRecipient">
+                            {{itemHistory.agencyRecipient.agencyCode ?
+                            itemHistory.agencyRecipient.agencyCode:'-'}}
+                          </ng-container>
+
+                        </div>
+                        <div class="card-footer">
+                          หน่วยงานย่อย
+                          <hr>
+                          ชื่อย่อ :
+                          <ng-container *ngIf="itemHistory.agencySecondaryRecipient">
+                            {{itemHistory.agencySecondaryRecipient.abbreviationName}}
+                          </ng-container>
+                          <ng-container *ngIf="!itemHistory.agencySecondaryRecipient">
+                            -
+                          </ng-container>
+
+                          <br>
+                          code :
+                          <ng-container *ngIf="itemHistory.agencySecondaryRecipient">
+                            {{itemHistory.agencySecondaryRecipient.agencyCode ?
+                            itemHistory.agencySecondaryRecipient.agencyCode:'-'}}
+                          </ng-container>
+                          <ng-container *ngIf="!itemHistory.agencySecondaryRecipient">
+                            -
+                          </ng-container>
+
+                        </div>
+                      </div> -->
+
+                    </div>
+                    <!-- <p class="p-3">[{{ item.agencySender.abbreviationName }}. ] - {{ item.comment }}</p> -->
+                  </div>
+                </ng-container>
+
+
+                <div class="" style="margin: 10px"></div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="!routingList">
+        <!-- <ng-container *ngIf="routingList.length < 0"> -->
+        <div>
+          <i class="fas fa-history bg-gray"></i>
+          <div class="timeline-item">
+            <div class="timeline-header no-borders">ไม่พบเหตุการณ์</div>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,205 @@
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0 text-dark">ทะเบียน รับ-ส่ง หนังสือ</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card card-outline card-primary">
+                    <div class="card-header">
+                        <h5 class="card-title"><i class="fa-solid fa-download"></i> รายการเอกสาร</h5>
+                        <button class="btn custom-edit-btn btn-sm ml-2 float-right" (click)="openLink()">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <br />
+                    </div>
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-4 mt-2">
+                                <div class="form-inline">
+                                    <label class="card-title mr-1">วันเริ่มต้น : </label>
+                                    <input
+                                        class="form-control"
+                                        placeholder="ปี-เดือน-วัน"
+                                        name="dp"
+                                        [(ngModel)]="dateStart"
+                                        ngbDatepicker
+                                        #d="ngbDatepicker"
+                                        [placement]="placement"
+                                    />
+                                    <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button">
+                                        <i class="fas fa-calendar-week"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-4 mt-2">
+                                <div class="form-inline">
+                                    <label class="card-title mr-1">วันสิ้นสุด : </label>
+                                    <input
+                                        class="form-control"
+                                        placeholder="ปี-เดือน-วัน"
+                                        name="dp"
+                                        [(ngModel)]="dateEnd"
+                                        ngbDatepicker
+                                        #d2="ngbDatepicker"
+                                        [placement]="placement"
+                                    />
+                                    <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button">
+                                        <i class="fas fa-calendar-week"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-4 mt-2">
+                                <div class="form-inline">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="card-title mr-1" style="margin: auto">ปลายทาง : </label>
+                                        <select style="width: 200px" class="form-control" [(ngModel)]="agencyIdRecipient">
+                                            <option value=""></option>
+                                            <option *ngFor="let item of allAgency" [value]="item.id">{{ item.agencyName }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-12 col-md-3 col-lg-4 col-xl-4 mt-2">
+                                <div class="form-inline">
+                                    <div class="d-flex justify-content-between">
+                                        <label class="card-title mr-1" style="margin: auto">หมายเลขเอกสาร : </label>
+                                        <input class="form-control" placeholder="หมายเลขเอกสาร(,)" [(ngModel)]="documentIds" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-12 mt-2">
+                                <button class="btn custom-info-btn float-right" (click)="searchPagination()">
+                                    <i class="fas fa-search"></i> ค้นหา
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <div class="row m-2" *ngIf="arrDocumentIdsChecked !== null && arrDocumentIdsChecked.length > 0">
+                            <div class="col-12">
+                                <h5 class="card-title"><i class="fa-solid fa-download"></i> รายการที่เลือก</h5>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row">
+                                    <div class="p-1" *ngFor="let item of arrDocumentIdsChecked">
+                                        <span class="badge badge-secondary">
+                                            {{ item.no }}
+                                            <i class="fa fa-solid fa-x"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr class="bg-teal">
+                                    <th scope="col" style="width: 5px">
+                                        <input type="checkbox" [(ngModel)]="ngCheckAllItem" (click)="checkAll()" />
+                                    </th>
+                                    <th scope="col">วันเดือนปี</th>
+                                    <th scope="col">เลขที่รับหนังสือ</th>
+                                    <th scope="col">เลขที่หนังสือ</th>
+                                    <th scope="col">วันที่หนังสือ</th>
+                                    <th scope="col">เอกสารสำเร็จ</th>
+                                    <th scope="col">จาก</th>
+                                    <th scope="col">ถึง</th>
+                                    <th scope="col">เรื่อง</th>
+                                    <th scope="col">การปฏิบัติ</th>
+                                    <th scope="col" class="text-center">เครื่องมือ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngIf="data?.datas?.length > 0">
+                                    <tr *ngFor="let item of data.datas; let i = index">
+                                        <th scope="col" style="width: 5px">
+                                            <input type="checkbox" [(ngModel)]="item.checked" (click)="checkUnCheck(i)" />
+                                        </th>
+                                        <th scope="col">{{ item.createdAt | dateOnlyFormat }}</th>
+                                        <th scope="col">{{ item.docNo }}</th>
+                                        <th scope="col">{{ item.governmentDocNo }}</th>
+                                        <th scope="col">-</th>
+                                        <th scope="col">{{ item.currentRouting + '/' + item.totalRouting }}</th>
+                                        <th scope="col">{{ item.formDoc }}</th>
+                                        <th scope="col">{{ item.toDoc }}</th>
+                                        <th scope="col">{{ item.name }}</th>
+                                        <th scope="col">
+                                            <ng-container *ngFor="let item2 of item.actionLists">
+                                                <p>{{ item2 }}</p>
+                                            </ng-container>
+                                        </th>
+                                        <th scope="col" class="text-center">
+                                            <button class="btn custom-info-btn btn-sm ml-2" (click)="openModalView(viewContent, i)">
+                                                <i class="fas fa-info-circle"></i>
+                                            </button>
+                                            <button class="btn custom-add-btn btn-sm ml-2" (click)="openModalView(timeLine, i, item.governmentDocNo)">
+                                                <i class="fas fa-business-time"></i>
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </ng-container>
+                            </tbody>
+                        </table>
+                        <ngb-pagination
+                            *ngIf="data && data.totalPages"
+                            class="m-3"
+                            style="float: right"
+                            [collectionSize]="data.totalPages * 10"
+                            [(page)]="ngPagination.page"
+                            [maxSize]="5"
+                            [boundaryLinks]="true"
+                            (pageChange)="paginationDocument()"
+                        >
+                        </ngb-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<ng-template #viewContent let-modal>
+    <div class="modal-header bg-custom-view">
+        <h4 class="modal-title" id="modal-basic-title">ตรวจสอบเอกสาร</h4>
+        <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <i class="fa-solid fa-x"></i>
+        </button>
+    </div>
+    <div class="modal-body">
+        <app-view-detail-doc [documentId]="data.datas[this.indexView].id"></app-view-detail-doc>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success" (click)="modal.dismiss('Cross click')" [disabled]="false">ปิด</button>
+    </div>
+</ng-template>
+
+<ng-template #timeLine let-modal>
+    <div class="modal-header">
+        <h4 class="modal-title"><i class="fas fa-business-time"></i> ลำดับเหตุการณ์</h4>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body" style="height: 70vh; overflow: auto">
+        <app-document-routing-list [routingList]="resFindOneDocumentHistoryForTimeLine"> </app-document-routing-list>
+    </div>
+    <div class="modal-footer">
+        <div class="row">
+            <div class="btn-group">
+                <button class="btn btn-danger" (click)="close()">ปิด</button>
+            </div>
+        </div>
+    </div>
+</ng-template>

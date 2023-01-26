@@ -1,0 +1,522 @@
+<div id="allSection">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0 text-dark">เอกสารกำลังดำเนินการ</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="card">
+        <div class="card-header">
+          <b><i class="fa-solid fa-file-circle-question"></i> ข้อมูลการสร้างเอกสารกำลังดำเนินการ</b>
+
+          <ng-container *ngIf="userDetail.role === 'manager'">
+
+          </ng-container>
+          <ng-container *ngIf="userDetail.role !== 'manager'">
+            <button class="btn custom-add-btn btn-sm ml-2 float-right"
+              (click)="openNewModalAdd(newContent); clearData(); isEdited = false">
+              <i class="fa-solid fa-plus"></i> เพิ่ม
+            </button>
+          </ng-container>
+          <button class="btn custom-print-btn btn-sm ml-2 float-right" [disabled]="checkDisableBtn()"
+            (click)="openModalQrCode(qrcode)">
+            <i class="fa-solid fa-barcode"></i> ปริ้นท์บาร์โค้ด
+          </button>
+
+          <div class="mt-3">
+
+
+
+            <form class="form-inline" [formGroup]="myForm">
+              <label class="card-title">วันเริ่มต้น : </label>
+              &nbsp;
+              <input formControlName="startAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+                [(ngModel)]="dateStart" ngbDatepicker #d="ngbDatepicker" [placement]="placement">
+              <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"> <i
+                  class="fas fa-calendar-week"></i></button>
+              &nbsp;
+
+              <label class="card-title">วันสิ้นสุด : </label>
+              &nbsp;
+              <input formControlName="endAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+                [(ngModel)]="dateEnd" ngbDatepicker #d2="ngbDatepicker" [placement]="placement">
+              <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button"> <i
+                  class="fas fa-calendar-week"></i></button>
+              &nbsp;
+
+
+
+            </form>
+
+            <form class="mt-3 d-flex justify-content-between" [formGroup]="myForm2">
+              <div class="d-flex justify-content-between ">
+                <label class="card-title" style="margin: auto;">หน่วยงานผู้รับ : </label>
+                &nbsp;
+                <select formControlName="agencyIdRecipient" style="width: 200px;" class="form-control"
+                  [(ngModel)]="agencyIdRecipient" (ngModelChange)="findAgencySecondary($event)">
+                  <option value=""></option>
+                  <option *ngFor="let item of allAgency" [value]="item.id">{{item.agencyName}}</option>
+                </select>
+                &nbsp;
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <label class="card-title" style="margin: auto;">หน่วยงานผู้รับย่อย : </label>
+                &nbsp;
+                <select formControlName="agencySecondaryIdRecipient" [(ngModel)]="agencySecondaryIdRecipient"
+                  style="width: 200px;" class="form-control">
+                  <ng-container *ngIf="allAgencySecondary">
+                    <option value=""></option>
+                    <option [value]="item.id" *ngFor="let item of allAgencySecondary">{{item.agencyName}}</option>
+                  </ng-container>
+                  <ng-container *ngIf="!allAgencySecondary">
+                    <option value=""></option>
+                  </ng-container>
+                </select>
+                &nbsp;
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <label class="card-title" style="margin: auto;">หน่วยงานผู้ส่ง : </label>
+                &nbsp;
+                <select formControlName="agencyIdSender" [(ngModel)]="agencyIdSender" style="width: 200px;"
+                  (ngModelChange)="findAgencySecondary2($event)" class="form-control">
+                  <option value=""></option>
+                  <option *ngFor="let item of allAgency" [value]="item.id">{{item.agencyName}}</option>
+                </select>
+                &nbsp;
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <label class="card-title" style="margin: auto;">หน่วยงานผู้ส่งย่อย : </label>
+                &nbsp;
+                <select formControlName="agencySecondaryIdSender" [(ngModel)]="agencySecondaryIdSender"
+                  style="width: 200px;" class="form-control">
+                  <ng-container *ngIf="allAgencySecondary2">
+                    <option value=""></option>
+                    <option [value]="item.id" *ngFor="let item of allAgencySecondary2">{{item.agencyName}}</option>
+                  </ng-container>
+                  <ng-container *ngIf="!allAgencySecondary2">
+                    <option value=""></option>
+                  </ng-container>
+                </select>
+                &nbsp;
+              </div>
+
+              <div class="d-flex justify-content-between">
+                <button class="btn custom-info-btn" (click)="searchPaginationDocument()"><i class="fas fa-search"></i>
+                  ค้นหา</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {{agencyIdRecipient}}
+        {{agencySecondaryIdRecipient}}
+        {{agencyIdSender}}
+        {{agencySecondaryIdSender}}
+        <div class="card-body">
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+              <thead>
+                <tr class="bg-teal">
+                  <th scope="col">เลือก</th>
+                  <th scope="col">#</th>
+                  <th scope="col">หมายเลขเอกสาร</th>
+                  <th scope="col">หัวเรื่อง</th>
+                  <th scope="col">เอกสารสำเร็จ</th>
+                  <th scope="col">บัญชีผู้นำเข้าระบบ</th>
+                  <th scope="col">ประเภท</th>
+                  <th scope="col">หน่วยงานปลายทาง</th>
+                  <th scope="col">ปี เดือน วัน</th>
+                  <th scope="col">ใช้เวลาไปแล้ว</th>
+                  <th scope="col" class="text-center">เครื่องมือ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of documentDataPaging.datas; let i = index">
+                  <td><input type="checkbox" class="form-group" [(ngModel)]="item.isSelect"
+                      (ngModelChange)="selectDocument(i)" /></td>
+                  <td>{{ i + 1 + (documentDataPaging.currentPage - 1) * pagingDocument.perPages }}</td>
+                  <td>{{ item.governmentDocNo }}</td>
+                  <td>{{ item.name }}</td>
+                  <td>{{ item.currentRouting + '/' + item.totalRouting }}</td>
+                  <td>{{ item.user.firstName + ' ' + item.user.lastName }}</td>
+                  <td>
+                    <span *ngIf="item.documentType === 'เอกสารภายใน'" class="badge custom-edit-btn">
+                      {{ item.documentType }}</span>
+                    <span *ngIf="item.documentType === 'เอกสารภายนอก'" class="badge btn-success">
+                      {{ item.documentType }}</span>
+                  </td>
+                  <td>{{ item.agency.agencyName }}</td>
+                  <td>{{ item.updatedAt }}</td>
+                  <td>{{ item.dateUse }}</td>
+                  <td class="text-center">
+                    <button class="btn custom-edit-btn btn-sm ml-2"
+                      (click)="openModelEdited(newContent, i); isEdited = true">
+                      <i class="fas fa-pen-to-square"></i>
+                    </button>
+                    <button class="btn custom-info-btn btn-sm ml-2" (click)="openModalView(viewContent, i)">
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm ml-2" (click)="deleteDocument(item.id)">
+                      <i class="fas fa-trash-can"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="documentDataPaging.datas.length !== 0" style="padding: 20px">
+              <ngb-pagination [collectionSize]="documentDataPaging.totalPages * 10" [(page)]="pagingDocument.page"
+                [maxSize]="10" [boundaryLinks]="true" (pageChange)="paginationDocument()"></ngb-pagination>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- add  document -->
+  <ng-template #newContent let-modal>
+    <div class="modal-header bg-custom-add">
+      <label class="modal-title" id="modal-basic-title">เพิ่มเอกสาร</label>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row" *ngIf="!isEdited">
+        <div class="col-12 form-group" style="display: flex; justify-content: end">
+          <div class="form-inline">
+            <label>จำนวนข้อมูลที่ต้องการเพิ่ม: </label>
+            &nbsp;
+            <input type="number" class="form-control rounded" [(ngModel)]="indexCountDoc" />
+            &nbsp;
+            <button class="btn btn-success bg-g-success" (click)="addDocumentArray(indexCountDoc)">
+              <i class="fa fa-plus" style="font-size: 15px" aria-hidden="true"></i>
+              เพิ่ม
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-container *ngFor="let item of formDocument; let i1 = index">
+        <div class="shadow-sm p-3 mb-3">
+          <div class="row">
+            <div class="col-12">
+              <label class="btn btn-primary bg-g-primary">ลำดับที่ {{ i1 + 1 }}</label>
+              <button *ngIf="formDocument.length > 1" (click)="deleteListDocument(i1)"
+                class="btn btn-danger float-right">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6 form-group">
+              <label>เลขที่หนังสือ: <span class="error">*</span></label>
+              <input type="text" [(ngModel)]="item.governmentDocNo" class="form-control"
+                [ngClass]="!isSubmit ? '' : item.governmentDocNo ? 'is-valid' : 'is-invalid'" />
+              <div class="invalid-feedback">หมายเลขเอกสาร</div>
+            </div>
+
+            <div class="col-6 form-group">
+              <label>หัวเรื่อง: <span class="error">*</span></label>
+              <input type="text" [(ngModel)]="item.name" class="form-control"
+                [ngClass]="!isSubmit ? '' : item.name ? 'is-valid' : 'is-invalid'" />
+              <div class="invalid-feedback">หัวเรื่อง</div>
+            </div>
+
+            <div class="col-6 form-group">
+              <label>ประเภท: <span class="error">*</span></label>
+              <select class="form-control" [(ngModel)]="item.documentType" aria-label="Default select example"
+                [ngClass]="!isSubmit ? '' : item.documentType ? 'is-valid' : 'is-invalid'">
+                <ng-container *ngIf="documentType.length > 0">
+                  <option *ngFor="let itemDocType of documentType; let i = index" [value]="itemDocType.value">
+                    {{ itemDocType.name }}
+                  </option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">ประเภท</div>
+            </div>
+
+            <div class="col-6 form-group">
+              <label for="">ระดับความสำคัญ: <span class="error">*</span></label>
+              <select [(ngModel)]="item.priority" class="form-control"
+                [ngClass]="!isSubmit ? '' : item.priority ? 'is-valid' : 'is-invalid'">
+                <ng-container *ngIf="priorityOption.length > 0">
+                  <option *ngFor="let itemPriorityOption of priorityOption; let i = index"
+                    [value]="itemPriorityOption.value">
+                    {{ itemPriorityOption.name }}
+                  </option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">ระดับความสำคัญ</div>
+            </div>
+
+            <div class="col-6 form-group">
+              <label for="">การอนุมัติ: <span class="error">*</span></label>
+              <select [(ngModel)]="item.isApprove" class="form-control"
+                [ngClass]="!isSubmit ? '' : item.isApprove !== null ? 'is-valid' : 'is-invalid'">
+                <option value="true">ต้องอนุมัติ</option>
+                <option value="false">ไม่ต้องอนุมัติ</option>
+              </select>
+              <div class="invalid-feedback">การอนุมัติ</div>
+            </div>
+
+            <div class="col-6 form-group">
+              <label for="">สถานะเริ่มต้นเอกสาร: <span class="error">*</span></label>
+              <select [(ngModel)]="item.isStatusSendOut" class="form-control"
+                [ngClass]="!isSubmit ? '' : item.isStatusSendOut !== null ? 'is-valid' : 'is-invalid'">
+                <option value="1">สร้างเอกสาร</option>
+                <option value="2">ส่งเอกสารไปยังหน่วยงานปลายทาง</option>
+              </select>
+              <div class="invalid-feedback">การอนุมัติ</div>
+            </div>
+
+            <div class="col-12 form-group">
+              <label>หมายเหตุ: </label>
+              <textarea class="form-control" [(ngModel)]="item.detail" cols="30" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="row-12">
+            <hr />
+          </div>
+
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label>ต้นทาง</label>
+            </div>
+
+            <div class="col-12">
+              <div class="d-flex justify-content-center">
+                <div class="col-6 form-group">
+                  <label>หน่วยงานต้นทาง: <span class="error">*</span></label>
+                  <select class="form-control" [(ngModel)]="item.sender.agencyIdSender"
+                    (ngModelChange)="changeAgencyIdSender(i1)"
+                    [ngClass]="!isSubmit ? '' : item.sender.agencyIdSender ? 'is-valid' : 'is-invalid'">
+                    <ng-container *ngIf="item.agencyData.length > 0">
+                      <ng-container *ngFor="let itemAgency of item.agencyData; let indexAgency = index">
+                        <option *ngIf="isAgency(itemAgency.id)" [value]="itemAgency.id">
+                          {{ itemAgency.agencyName }}
+                        </option>
+                      </ng-container>
+                    </ng-container>
+                  </select>
+                  <div class="invalid-feedback">หน่วยงานต้นทาง</div>
+                </div>
+
+                <div class="col-6 form-group">
+                  <label>หน่วยงานต้นทางย่อย: </label>
+                  <select class="form-control" [(ngModel)]="item.sender.agencySecondaryIdSender"
+                    [disabled]="!item.sender.agencyIdSender"
+                    [ngClass]="!isSubmit ? '' : item.sender.agencySecondaryIdSender ? 'is-valid' : 'is-invalid'">
+                    <ng-container *ngFor="let itemAgency of item.agencyData">
+                      <ng-container *ngIf="itemAgency.id === item.sender.agencyIdSender">
+                        <option *ngFor="let itemAgencySecondary of itemAgency.agencySecondaryLists"
+                          [value]="itemAgencySecondary.id">
+                          {{ itemAgencySecondary.agencyName }}
+                        </option>
+                      </ng-container>
+                    </ng-container>
+                  </select>
+                  <div class="invalid-feedback">หน่วยงานต้นทางย่อย</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-12">
+            <hr />
+          </div>
+
+          <div class="col-12 mb-3 header-secondary">
+            <label>ปลายทาง</label>
+            <button class="btn btn-success bg-g-success float-right" (click)="addRecipient(i1)">
+              <i class="fa-solid fa-plus"></i> เพิ่มหน่วยงานปลายทาง
+            </button>
+          </div>
+
+          <div class="col-12">
+            <div class="card card-white" *ngFor="let item2 of item.agencyData; let indexAgencyData = index"
+              [class.collapsed-card]="item2.collapsed">
+              <div class="card-header">
+                <span class="ml-3">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="item2.isSelectAll"
+                    (ngModelChange)="isSelectOrUnSelect(i1, indexAgencyData); isSelectOrUnSelect2(i1, indexAgencyData)" />
+                  <label>
+                    {{ item2.agencyName }}
+                  </label>
+
+                  <span *ngIf="item2.isSelectAll" class="badge bg-danger ml-2 bg-g-danger">เลือกทั้งหมด</span>
+                </span>
+
+                <div class="card-tools">
+                  <!-- data-card-widget="collapse" -->
+                  <button type="button" class="btn btn-tool" (click)="item2.collapsed = !item2.collapsed">
+                    <i *ngIf="!item2.collapsed" class="fas fa-plus"></i>
+                    <i *ngIf="item2.collapsed" class="fas fa-minus"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="card-body card-outline card-primary"
+                [style]="item2.collapsed ? 'display: block' : 'display: none'">
+                <div class="form-group">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" [(ngModel)]="item2.isSelectAll"
+                      (ngModelChange)="isSelectOrUnSelect(i1, indexAgencyData); isSelectOrUnSelect2(i1, indexAgencyData)" />
+                    <label class="form-check-label">ทั้งหมด</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" [(ngModel)]="item2.isSelect" type="checkbox"
+                      (ngModelChange)="isSelectOrUnSelect2(i1, indexAgencyData)" />
+                    <label class="form-check-label">{{ item2.agencyName }}</label>
+                  </div>
+                  <div class="form-check" style="margin-left: 20px" *ngFor="let item2 of item2.agencySecondaryLists">
+                    <input class="form-check-input" [(ngModel)]="item2.isSelect" type="checkbox"
+                      (ngModelChange)="isSelectOrUnSelect2(i1, indexAgencyData)" />
+                    <label class="form-check-label">{{ item2.agencyName }}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row-12">
+            <hr />
+          </div>
+
+          <div class="row">
+            <div class="col-12 mb-3">
+              <label>แนบไฟล์</label>
+            </div>
+
+            <div class="col-6 mb-3" style="height: 248px">
+              <div class="container-upload" appDnd (fileDropped)="onFileDropped($event, i1)">
+                <input type="file" #fileDropRef id="fileDropRef" accept="image/*,.pdf" multiple
+                  (change)="fileBrowseHandler($event, i1)" />
+                <svg xmlns="http://www.w3.org/2000/svg" width="63" height="64" viewBox="0 0 63 64">
+                  <g fill="#3B454F" fill-rule="nonzero">
+                    <path
+                      d="M42.656 15.135a1.953 1.953 0 0 1-1.391-.578L31.5 4.795l-9.765 9.762a1.97 1.97 0 1 1-2.785-2.785L30.106.616a1.97 1.97 0 0 1 2.785 0l11.157 11.156a1.97 1.97 0 0 1-1.392 3.363z" />
+                    <path
+                      d="M31.5 36.791a1.97 1.97 0 0 1-1.969-1.969V2.01a1.97 1.97 0 0 1 3.938 0v32.812a1.97 1.97 0 0 1-1.969 1.969z" />
+                    <path
+                      d="M55.781 63.041H7.22A7.225 7.225 0 0 1 0 55.822V41.385a4.599 4.599 0 0 1 4.594-4.594h7.234a4.567 4.567 0 0 1 4.402 3.276l2.814 9.382a.658.658 0 0 0 .628.467h23.656a.658.658 0 0 0 .628-.467l2.814-9.385a4.572 4.572 0 0 1 4.402-3.273h7.234A4.599 4.599 0 0 1 63 41.385v14.437a7.225 7.225 0 0 1-7.219 7.219zM4.594 40.729a.656.656 0 0 0-.657.656v14.437a3.286 3.286 0 0 0 3.282 3.282H55.78a3.286 3.286 0 0 0 3.282-3.282V41.385a.656.656 0 0 0-.657-.656h-7.234a.65.65 0 0 0-.628.467L47.73 50.58a4.628 4.628 0 0 1-4.402 3.274H19.672a4.567 4.567 0 0 1-4.402-3.276l-2.814-9.382a.65.65 0 0 0-.628-.467H4.594z" />
+                  </g>
+                </svg>
+
+                <h3 class="mt-2">ลากและวางไฟล์ที่นี่</h3>
+                <label for="fileDropRef" class="mt-2">เรียกดูไฟล์</label>
+              </div>
+            </div>
+
+            <div class="col-6 mb-3" style="height: 248px; overflow-y: scroll">
+              <div class="files-list">
+                <ng-container *ngFor="let file of item.files; let i = index">
+                  <div class="single-file" *ngIf="!file.isDelete">
+                    <div class="file-icon" style="width: 50px">
+                      <img [src]="getMaterialFileIcon1(file?.icon)" width="24" />
+                    </div>
+                    <div class="info">
+                      <h4 class="name">
+                        {{ file?.nameFile }}
+                      </h4>
+                      <p class="size">
+                        {{ formatBytes(file?.size) }}
+                      </p>
+                    </div>
+
+                    <div class="delete" (click)="file.isDelete = true">
+                      <i class="fas fa-trash"></i>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-success bg-g-success" [disabled]="checkInput()"
+        (click)="onSubmitTemplateBased()">
+        {{ isEdited ? 'อัพเดท' : 'บันทึก' }}
+      </button>
+    </div>
+  </ng-template>
+
+  <ng-template #viewContent let-modal>
+    <div class="modal-header bg-custom-view">
+      <label class="modal-title" id="modal-basic-title">ตรวจสอบเอกสาร</label>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <i class="fa-solid fa-x"></i>
+      </button>
+    </div>
+    <div class="modal-body" style="height:80vh;overflow:auto">
+      <app-view-detail-doc [documentId]="documentDataPaging.datas[this.indexView].id"></app-view-detail-doc>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-success bg-g-success" (click)="modal.dismiss('Cross click')"
+        [disabled]="false">ปิด</button>
+    </div>
+  </ng-template>
+
+  <ng-template #qrcode let-modal>
+    <div class="modal-header">
+      <label class="modal-title" id="modal-basic-title">ปริ้นท์บาร์โค้ด</label>
+      <button type="button" class="btn btn-close" aria-label="Close" (click)="modal.dismiss()"><i
+          class="fa-solid fa-x"></i></button>
+    </div>
+    <div class="modal-body" id="qrcode" style="height: 70vh; overflow: scroll">
+      <div class="row">
+
+        <ng-container *ngFor="let item of barcode; let i = index">
+
+          <!-- grid
+          <div class="col-12" style="padding-bottom:10px" [ngClass]="{'text-end':i%2 === 0}">
+          <div class="col-12" style="padding-bottom:10px;">
+            <h4>{{ item.name ? item.name : '' }}</h4>
+            <hr>
+            <img [id]="'barcode' + i" style="border:1px solid rgb(49, 49, 49);transform: rotate(90deg);" />
+          </div> -->
+
+          <ng-container *ngIf="item.isSelect">
+            <!-- table -->
+            <table class="table table-hover text-nowrap">
+              <thead>
+                <tr class="bg-teal text-center">
+                  <th scope="col">#</th>
+                  <th scope="col">{{ item.name ? item.name : '' }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="text-center">
+                  <td class="align-middle">{{ i + 1 }}</td>
+                  <td class="align-middle">
+                    <svg id="barcode{{i}}" style="border:1px solid rgb(49, 49, 49);" />
+                    <br />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+
+        </ng-container>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn custom-info-btn" (click)="printBarcode()"><i class="fas fa-print"></i>
+        ปริ้นท์</button>
+    </div>
+  </ng-template>
+
+</div>

@@ -1,0 +1,78 @@
+<div class="card" style="padding: 10px;">
+  <div class="card-body table-responsive p-0">
+    <div class="row" style="padding-left: 20px; padding-bottom: 5px;">
+
+      <div class="col-8">
+        <table>
+          <tbody>
+            <tr>
+              <td>
+                total: {{resPaginationDocumentSummary && resPaginationDocumentSummary.totalItems ?
+                resPaginationDocumentSummary.totalItems : 0}} |
+              </td>
+              <td>
+                <select (change)="paginationDocumentSummary()" [(ngModel)]="reqPaginationDocumentSummary.perPages"
+                  class="form-control" style="width: 70px;">
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-4">
+        <div class="card-tools">
+          <div class="input-group input-group-sm">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input (keyup)="paginationDocumentSummary()" [(ngModel)]="reqPaginationDocumentSummary.search" type="text"
+              name="table_search" class="form-control float-right" placeholder="ค้นหา" style="border-radius: 5px" />
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default shadow-none">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <table class="table table-hover text-nowrap">
+      <thead>
+        <tr class="bg-teal">
+          <th>#</th>
+          <th>เอกสาร</th>
+          <th>priority</th>
+          <th>ประเภท</th>
+          <th>หน่วยงาน</th>
+          <th>บัญชีผู้ใช้</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="haveUserPagingDatas">
+        <tr *ngFor="let item of resPaginationDocumentSummary.datas;let i = index">
+          <td>{{((reqPaginationDocumentSummary.page - 1) * reqPaginationDocumentSummary.perPages) + (1 + i)}}</td>
+          <td>{{item.name}}</td>
+          <td>{{item.priority}}</td>
+          <td>{{item.documentType}}</td>
+          <td>{{item.agencyId}}</td>
+          <td>{{item.userId}}</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!haveUserPagingDatas">
+        <tr>
+          <td colspan="6" style="text-align: center;">
+            <p>ไม่พบข้อมูล</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <ngb-pagination [collectionSize]="resPaginationDocumentSummary.totalPages * 10"
+      [(page)]="reqPaginationDocumentSummary.page" [maxSize]="5" [boundaryLinks]="true"
+      (pageChange)="haveUserPagingDatas = false; paginationDocumentSummary()">
+    </ngb-pagination>
+  </div>
+</div>

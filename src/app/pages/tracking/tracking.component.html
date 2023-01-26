@@ -1,0 +1,338 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">ติดตามเอกสาร</h1>
+      </div>
+      <!-- /.col -->
+      <!-- <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">Dashboard v1</li>
+        </ol>
+      </div> -->
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+  </div>
+  <!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<!-- Main content -->
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+
+      <div class="card-header" style="display: flex; justify-content: end;">
+        <form class="form-inline" [formGroup]="myForm">
+          <label class="card-title">วันเริ่มต้น : </label>
+          &nbsp;
+          <input formControlName="startAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+            [(ngModel)]="dateStart" ngbDatepicker #d="ngbDatepicker" [placement]="placement">
+          <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"> <i
+              class="fas fa-calendar-week"></i></button>
+          &nbsp;
+
+          <label class="card-title">วันสิ้นสุด : </label>
+          &nbsp;
+          <input formControlName="endAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp" [(ngModel)]="dateEnd"
+            ngbDatepicker #d2="ngbDatepicker" [placement]="placement">
+          <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button"> <i
+              class="fas fa-calendar-week"></i></button>
+          &nbsp;
+          <!-- <pre>{{dateStart | json}}</pre>
+          <pre>{{dateEnd | json}}</pre> -->
+        </form>
+      </div>
+      <div class="card-header" style="display: flex; justify-content: end;">
+
+
+        <form class="form-inline">
+          <!-- TODO ทำกรองข้อมูลหน่วยงานสำหรับสิทธิ์ admin superAdmin -->
+          <!-- <label class="card-title">กรองข้อมูลตามหน่วยงาน : </label>
+          &nbsp;
+          <select class="form-control rounded" aria-label="Default select example">
+            <option selected>เอกสารสำเร็จ</option>
+            <option value="1">เอกสารไม่สำเร็จ</option>
+          </select>
+          &nbsp; -->
+
+          <!-- <label class="card-title">กรองข้อมูล : </label>
+          &nbsp;
+          <select class="form-control rounded" aria-label="Default select example">
+            <option selected>วัน เดือน ปี</option>
+            <option value="1">หมายเลขเอกสาร</option>
+            <option value="2">หน่วยงาน</option>
+          </select> -->
+          &nbsp;
+          <label class="card-title">ค้นหาเอกสาร : </label>
+          &nbsp;
+          <input type="search" class="form-control rounded" placeholder="หมายเลขเอกสาร, ชื่อ-สกุล, หน่วยงาน">
+          &nbsp;
+          <button class="btn btn-primary" (click)="searchPagination()"><i class="fas fa-search"></i></button>
+        </form>
+
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <div class="card-body table-responsive p-0">
+
+          <table class="table table-hover text-nowrap">
+            <thead>
+              <tr class="bg-teal">
+                <th scope="col">#</th>
+                <th scope="col">หมายเลขเอกสาร</th>
+                <th scope="col">เอกสารสำเร็จ</th>
+                <th scope="col">หัวเรื่อง</th>
+                <th scope="col">บัญชีผู้นำเข้าระบบ</th>
+                <th scope="col">ประเภท</th>
+                <th scope="col">สถานะ</th>
+                <th scope="col">ปี เดือน วัน</th>
+                <th scope="col">ใช้เวลาไปแล้ว</th>
+                <th scope="col">เพิ่มเติม</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngIf="resPaginationDocumentHistoryData">
+                <tr *ngFor="let item of resPaginationDocumentHistoryData.datas; let i = index">
+                  <td>{{i + 1}}</td>
+                  <td>{{item.governmentDocNo}}</td>
+                  <td>{{item.name}}</td>
+                  <td>{{item.currentRouting + '/' + item.totalRouting}}</td>
+                  <td>{{item.user.firstName}} {{item.user.lastName}} ( {{item.user.phoneNumberSecure}} )</td>
+                  <td>
+                    <span *ngIf="item.documentType === 'เอกสารภายใน'"
+                      class="badge custom-edit-btn">{{item.documentType}}</span>
+                    <span *ngIf="item.documentType === 'เอกสารภายนอก'"
+                      class="badge custom-edit-btn">{{item.documentType}}</span>
+                  </td>
+                  <!-- <td *ngIf="item.documentType === 'internal'"><span class="badge custom-edit-btn">ภายใน</span></td>
+                  <td *ngIf="item.documentType === 'external'"><span class="badge badge-danger">ภายนอก</span></td> -->
+                  <td><span class="badge badge-info">{{item.documentRoutingLists[0].status}}</span></td>
+                  <td>{{item.createdAt | dateFormat1}}</td>
+                  <td>{{item.calFromNow}}</td>
+                  <td>
+                    <button class="btn custom-tracking-btn" (click)="openHistory(history, item.barcode)">
+                      <i class="fas fa-business-time"></i>
+                    </button>
+                  </td>
+                </tr>
+              </ng-container>
+              <ngb-pagination [collectionSize]="resPaginationDocumentHistory.resData.totalPages * 10"
+                [(page)]="reqPaginationDocumentHistory.page" [maxSize]="5" [boundaryLinks]="true"
+                (pageChange)="havePagingDatas = false; getUserPagination()">
+              </ngb-pagination>
+              <!-- <tr *ngFor="let item of preData; let i = index">
+                <td>{{item.id}}</td>
+                <td>{{item.code}}</td>
+                <td>{{item.title}}</td>
+                <td>{{item.account}}</td>
+                <td *ngIf="item.type === 'ภายใน'"><span class="badge custom-edit-btn">{{item.type}}</span></td>
+                <td *ngIf="item.type === 'ภายนอก'"><span class="badge badge-danger">{{item.type}}</span></td>
+                <td *ngIf="item.status === 'เอกสารยังไม่สำเร็จ'"><span class="badge badge-danger">{{item.status}}</span>
+                </td>
+                <td *ngIf="item.status === 'เอกสารสำเร็จ'"><span class="badge badge-success">{{item.status}}</span></td>
+                <td>{{item.createdAt}}</td>
+                <td>{{item.daySpend}}</td>
+                <td>
+                  <button class="btn custom-tracking-btn" (click)="openVerticallyCentered(search)">
+                    <i class="fas fa-business-time"></i>
+                  </button>
+                </td>
+              </tr> -->
+              <!-- <tr>
+                <th scope="row">1</th>
+                <td>1234444432</td>
+                <td>หัวเรื่อง 1</td>
+                <td>admin</td>
+                <td><span class="badge badge-success">ภายใน</span></td>
+                <td>สสส.</td>
+                <td>2564-04-27 09:10:54</td>
+                <td>2 วัน</td>
+                <td><button class="btn btn-primary" (click)="openVerticallyCentered(search)">
+                    <i class="fas fa-business-time"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>1234444434</td>
+                <td>หัวเรื่อง 2</td>
+                <td>admin</td>
+                <td><span class="badge badge-danger">ภายนอก</span></td>
+                <td>สป.</td>
+                <td>2564-04-27 10:00:35</td>
+                <td>1 วัน</td>
+                <td><button class="btn btn-primary" (click)="openVerticallyCentered(search)"><i
+                      class="fas fa-business-time"></i></button>
+              </tr>
+              <tr>
+                <th scope="row">3</th>
+                <td>5544433439</td>
+                <td>หัวเรื่อง 3</td>
+                <td>admin</td>
+                <td><span class="badge badge-danger">ภายนอก</span></td>
+                <td>กย.</td>
+                <td>2564-04-27 13:20:03</td>
+                <td>4 วัน</td>
+                <td><button class="btn btn-primary" (click)="openVerticallyCentered(search)"><i
+                      class="fas fa-business-time"></i></button>
+              </tr> -->
+            </tbody>
+
+          </table>
+          <!-- <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+              <li class="page-item disabled">
+                <a class="page-link" tabindex="-1">Previous</a>
+              </li>
+              <li class="page-item"><a class="page-link">1</a></li>
+              <li class="page-item"><a class="page-link">2</a></li>
+              <li class="page-item"><a class="page-link">3</a></li>
+              <li class="page-item">
+                <a class="page-link">Next</a>
+              </li>
+            </ul>
+          </nav> -->
+        </div>
+      </div>
+      <!-- /.card-body -->
+
+    </div>
+  </div>
+  <!-- Main row -->
+</section>
+<!-- /.content -->
+
+<!-- Modal -->
+<ng-template #search let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-business-time"></i> ลำดับเหตุการณ์</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- timeline -->
+    <div class="row m-3">
+      <div class="col-sm-12 col-md-12 col-ls-12">
+        <div class="timeline">
+          <div class="time-label">
+            <span class="bg-primary"><i class="fas fa-calendar-week"></i> เหตุการณ์</span>
+          </div>
+          <div>
+            <i class="fas fa-angle-double-down bg-success"></i>
+            <div class="timeline-item">
+              <div class="timeline-header"><i class="fas fa-clock" style="color: #676fa3"></i> 2564-04-27 09:10:54</div>
+              <div class="timeline-body">
+                <p class="p-3">
+                  [สสส. ] - ได้รับเอกสารเรียบร้อยแล้ว
+                </p>
+                <!-- <div class="col-lg-6 col-sm-12 col-md-12 col-6">
+                  <div>
+                  </div>
+                </div> -->
+              </div>
+
+              <div class="" style="margin: 10px"></div>
+            </div>
+          </div>
+          <div>
+            <i class="fas fa-history bg-gray"></i>
+            <div class="timeline-item">
+              <div class="timeline-header no-borders">ไม่พบเหตุการณ์</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="row">
+      <div class="btn-group">
+        <button class="btn btn-danger" (click)="close()">ปิด</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #modalInformation let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">รายละเอียดเอกสาร</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <p>One fine body&hellip;</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+  </div>
+</ng-template>
+
+<ng-template #history let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-business-time"></i> ลำดับเหตุการณ์</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- <div class="modal-body">
+    <div class="row m-3">
+      <div class="col-sm-12 col-md-12 col-ls-12">
+        <div class="timeline">
+          <div class="time-label">
+            <span class="btn-success"><i class="fas fa-calendar-week"></i> เหตุการณ์</span>
+          </div>
+          <ng-container *ngIf="historyDetail.length > 0">
+            <ng-container *ngFor="let item of historyDetail">
+              <div>
+                <i class="fas fa-angle-double-down custom-edit-btn"></i>
+                <div class="timeline-item">
+                  <div class="timeline-header d-flex justify-content-between">
+                    <div>
+                      <i class="fas fa-clock" style="color: #676fa3"></i>
+                      {{ item.createdAt | dateFormat1 }}
+                    </div>
+                    <div><span class="badge badge-info">{{item.status | statusThai}}</span></div>
+
+                  </div>
+                  <div class="timeline-body">
+                    <p class="p-3">
+                      [{{item.agencySender.abbreviationName}}. ] - {{item.comment}}
+                    </p>
+                  </div>
+
+                  <div class="" style="margin: 10px"></div>
+                </div>
+              </div>
+
+            </ng-container>
+          </ng-container>
+          <ng-container *ngIf="historyDetail.length <= 0">
+            <div>
+              <i class="fas fa-history bg-gray"></i>
+              <div class="timeline-item">
+                <div class="timeline-header no-borders">ไม่พบเหตุการณ์</div>
+              </div>
+            </div>
+          </ng-container>
+
+
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <div class="modal-body" style="height:70vh;overflow:auto">
+    <app-document-routing-list [routingList]="resFindOneDocumentHistoryForTimeLine">
+    </app-document-routing-list>
+
+  </div>
+  <div class="modal-footer">
+    <div class="row">
+      <div class="btn-group">
+        <button class="btn btn-danger" (click)="close()">ปิด</button>
+      </div>
+    </div>
+  </div>
+</ng-template>

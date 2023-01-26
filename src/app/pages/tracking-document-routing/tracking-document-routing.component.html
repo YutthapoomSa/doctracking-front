@@ -1,0 +1,166 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">ค้นหาเอกสาร</h1>
+        <!-- <h1 class="m-0 text-dark">รับเข้าเอกสาร</h1> -->
+      </div>
+      <div class="col-sm-6">
+
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-2"></div>
+      <div class="col-8">
+        <div class="input-group">
+
+          <input id="search" type="search" class="form-control form-control-lg" placeholder="หมายเลขเอกสาร"
+            [(ngModel)]="textSearch" (ngModelChange)="textSearchChange($event)" />
+        </div>
+        <div class="input-group-append" style="margin-top: 5px">
+          <button class="btn custom-edit-btn" (click)="searchPagination()" type="submit">ค้นหา</button>
+        </div>
+      </div>
+
+      <div class="col-2">
+      </div>
+    </div>
+    <br>
+    <div class="row  d-flex justify-content-center">
+      <div class="col-12"></div>
+      <div class="card-tite">
+        <form class="form-inline" [formGroup]="myForm">
+          <label class="card-title">วันเริ่มต้น : </label>
+          &nbsp;
+          <input formControlName="startAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp"
+            style="width: auto;" [(ngModel)]="dateStart" ngbDatepicker #d="ngbDatepicker" [placement]="placement">
+          <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"> <i
+              class="fas fa-calendar-week"></i></button>
+          &nbsp;
+
+          <label class="card-title">วันสิ้นสุด : </label>
+          &nbsp;
+          <input formControlName="endAt" class="form-control" placeholder="ปี-เดือน-วัน" name="dp" [(ngModel)]="dateEnd"
+            ngbDatepicker #d2="ngbDatepicker" [placement]="placement" style="width: auto;">
+          <button class="btn btn-outline-secondary" (click)="d2.toggle()" type="button"> <i
+              class="fas fa-calendar-week"></i></button>
+          &nbsp;
+          <div class="d-flex justify-content-between ">
+            <label class="card-title" style="margin: auto;">หน่วยงานหลัก : </label>
+            &nbsp;
+            <select formControlName="agencySelected" style="width: 100px;" class="form-control"
+              [(ngModel)]="agencySelected" (ngModelChange)="findAllSecondaryAgency($event)">
+              <option value=""></option>
+              <option *ngFor="let item of allAgency" [value]="item.id">{{item.agencyName}}</option>
+            </select>
+            &nbsp;
+            <label class="card-title" style="margin: auto;">หน่วยงานย่อย : </label>
+            &nbsp;
+            <select formControlName="agencySecondarySelected" style="width: 100px;" class="form-control"
+              [(ngModel)]="agencySecondarySelected" [disabled]="!agencySelected">
+              <ng-container *ngIf="allSecondaryAgency">
+                <option value=""></option>
+                <option [value]="item.id" *ngFor="let item of allSecondaryAgency">{{item.agencyName}}</option>
+              </ng-container>
+              <ng-container *ngIf="!allSecondaryAgency">
+                <option value=""></option>
+              </ng-container>
+            </select>
+            &nbsp;
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card card-outline card-primary">
+          <div class="card-header">
+            <h5 class="card-title"><i class="fa-solid fa-magnifying-glass"></i> ค้นหาเอกสาร</h5>
+          </div>
+
+          <div class="card-body table-responsive p-0">
+            <table class="table table-hover text-nowrap">
+              <thead>
+                <tr class="bg-teal">
+                  <th scope="col" style="width: 5px"></th>
+                  <th scope="col">#</th>
+                  <th scope="col">หมายเลขเอกสาร</th>
+                  <th scope="col">หัวเรื่อง</th>
+                  <th scope="col">บัญชีผู้นำเข้าระบบ</th>
+                  <th scope="col">ประเภท</th>
+                  <th scope="col">วัน เดือน ปี</th>
+                  <th scope="col" class="text-center">เครื่องมือ</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <ng-container *ngIf="dataWaitForSend && dataWaitForSend.length > 0">
+                  <tr *ngFor="let item of dataWaitForSend; let i = index">
+                    <td>
+
+                    </td>
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item.governmentDocNo }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.user.firstName + ' ' + item.user.lastName }}</td>
+                    <td>
+                      <span *ngIf="item.documentType === 'เอกสารภายใน'"
+                        class="badge custom-edit-btn">{{item.documentType}}</span>
+                      <span *ngIf="item.documentType === 'เอกสารภายนอก'"
+                        class="badge badge-danger">{{item.documentType}}</span>
+                    </td>
+                    <td>{{ item.createdAt | dateFormat1 }}</td>
+                    <td class="text-center">
+                      <button class="btn custom-tracking-btn btn-sm ml-2"
+                        (click)="openHistory(history, item.governmentDocNo)">
+                        <i class="fas fa-business-time"></i>
+                      </button>
+                      <!-- <button class="btn btn-danger btn-sm ml-2" (click)="del(i)">
+                          <i class="fas fa-trash-can"></i>
+                        </button> -->
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+<ng-template #history let-c="close">
+  <div class="modal-header">
+    <h4 class="modal-title"><i class="fas fa-business-time"></i> ลำดับเหตุการณ์</h4>
+    <button type="button" class="close" aria-label="Close" (click)="c('save click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body" style="height:70vh;overflow:auto">
+    <app-document-routing-list [routingList]="resFindOneDocumentHistoryForTimeLine">
+    </app-document-routing-list>
+
+  </div>
+  <div class="modal-footer">
+    <div class="row">
+      <div class="btn-group">
+        <button class="btn btn-danger" (click)="c('save click')">ปิด</button>
+      </div>
+    </div>
+  </div>
+</ng-template>

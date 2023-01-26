@@ -1,0 +1,215 @@
+<div class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6">
+        <h1 class="m-0 text-dark">จัดการหน่วยงาน</h1>
+      </div>
+      <!-- <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right">
+          <li class="breadcrumb-item"><a href="#">Home</a></li>
+          <li class="breadcrumb-item active">จัดการหน่วยงาน</li>
+        </ol>
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<section class="content">
+  <div class="container-fluid">
+    <div class="card">
+      <div class="card-header">
+        <b><i class="fa-solid fa-folder-tree"></i> ข้อมูลหน่วยงาน</b>
+
+        <ng-container *ngIf="userDetail.role === 'manager'">
+
+        </ng-container>
+        <ng-container *ngIf="userDetail.role !== 'manager'">
+          <button class="btn custom-add-btn btn-sm ml-2 float-right" (click)="openModelAdd(creatOrUpdate)">
+            <i class="fa-solid fa-plus"></i> เพิ่ม
+          </button>
+        </ng-container>
+      </div>
+      <div class="card-body">
+        <div class="card-body table-responsive p-0">
+          <div class="row mt-3 mb-2">
+            <div class="col-8">
+              <div class="card-tools">
+                <div class="input-group input-group-sm">
+                  ทั้งหมด : {{ agencyDataPaging.totalItems }} |
+
+                  <div style="width: 70px; margin-top: -5px; margin-left: 5px">
+                    <select [(ngModel)]="pagingAgency.perPages" class="form-control"
+                      (change)="paginationAgency(null, 1)">
+                      <option *ngFor="let item of perPage" value="{{ item }}">{{ item }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="card-tools">
+                <div class="input-group input-group-sm">
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <input (keyup)="paginationAgency($event)" type="text" name="table_search"
+                    class="form-control float-right" placeholder="ค้นหา" style="border-radius: 5px" />
+
+                  <div class="input-group-append">
+                    <button type="submit" class="btn btn-default shadow-none">
+                      <i class="fas fa-search"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <hr />
+          <table class="table table-hover text-nowrap">
+            <thead>
+              <tr class="bg-teal">
+                <th>#</th>
+                <th>รหัส</th>
+                <th>ชื่อย่อ</th>
+                <th>ชื่อ</th>
+                <th class="text-center">เครื่องมือ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of agencyDataPaging.datas; let i = index">
+                <td>{{ i + 1 + (agencyDataPaging.currentPage - 1) * pagingAgency.perPages }}</td>
+                <td>{{ item.agencyCode }}</td>
+                <td>{{ item.abbreviationName }}</td>
+                <td>{{ item.agencyName }}</td>
+                <td class="text-center">
+                  <button class="btn custom-edit-btn btn-sm ml-2" (click)="openModelEdited(creatOrUpdate, item.id)"
+                    ngbTooltip="แก้ไข">
+                    <i class="fas fa-pen-to-square"></i>
+                  </button>
+                  <button class="btn custom-info-btn btn-sm ml-2" (click)="openModalView(viewDetail, i)"
+                    ngbTooltip="ดูรายละเอียด">
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm ml-2" ngbTooltip="ลบ" (click)="delAgency(item.id)">
+                    <i class="fas fa-trash-can"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="agencyDataPaging.datas.length === 0">
+              <tr>
+                <td colspan="5" style="text-align: center">ไม่พบข้อมูลในตาราง</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="agencyDataPaging.datas.length !== 0" style="padding: 20px">
+            <ngb-pagination [collectionSize]="agencyDataPaging.totalPages * 10" [(page)]="pagingAgency.page"
+              [maxSize]="10" [boundaryLinks]="true" (pageChange)="paginationAgency()"></ngb-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #creatOrUpdate let-modal>
+  <div class="modal-header" [ngClass]="{'bg-custom-edit': idEdit, 'bg-custom-add': !idEdit}">
+    <h4 class="modal-title" id="modal-basic-title">{{ idEdit ? 'แก้ไขหน่วยงาน' : 'เพิ่มหน่วยงาน' }}</h4>
+    <button type="button" class="btn btn-close" style="color: aliceblue" (click)="modal.dismiss()">
+      <i class="fa-solid fa-x"></i>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-12 form-group">
+          <label>ชื่อหน่วยงาน: <span class="error">*</span></label>
+          <input type="text" class="form-control" [(ngModel)]="ngForm.agencyName" />
+        </div>
+
+        <div class="col-6 form-group">
+          <label>รหัสหน่วยงาน: <span class="error">*</span></label>
+          <input type="text" class="form-control" [(ngModel)]="ngForm.agencyCode" />
+        </div>
+
+        <div class="col-6 form-group">
+          <label>ชื่อย่อหน่วยงาน: <span class="error">*</span></label>
+          <input type="text" class="form-control" [(ngModel)]="ngForm.abbreviationName" />
+        </div>
+      </div>
+      <hr />
+      <div class="header-secondary">
+        <h3>หน่วยงานในสังกัด</h3>
+        <button type="submit" class="btn custom-add-btn btn-sm float-right" (click)="addFormAgencyList()">
+          <i class="fa-solid fa-plus"></i> เพิ่มหน่วยงาน
+        </button>
+      </div>
+      <div class="row mt-3">
+        <ng-container *ngFor="let item of ngForm.agencyList; let i = index">
+          <div class="col-12">
+            <hr class="custom-hr" />
+          </div>
+          <div class="col-12 header-secondary">
+            <button class="btn custom-add-btn  mt-2 mb-2">ลำดับที่ {{ i + 1 }}</button>
+            <button type="submit" class="btn btn-danger btn-sm mr-3" (click)="delFormAgencyList(i)">ลบ</button>
+          </div>
+          <div class="col-12 form-group">
+            <label>ชื่อหน่วยงาน: <span class="error">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="item.agencyName" />
+          </div>
+
+          <div class="col-6 form-group">
+            <label>รหัสหน่วยงาน: <span class="error">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="item.agencyCode" />
+          </div>
+
+          <div class="col-6 form-group">
+            <label>ชื่อย่อหน่วยงาน: <span class="error">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="item.abbreviationName" />
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-success" (click)="saveDepartments()"
+      [disabled]="checkDisable()">บันทึก</button>
+  </div>
+</ng-template>
+
+<ng-template #viewDetail let-modal>
+  <div class="modal-header bg-custom-view">
+    <h4 class="modal-title" id="modal-basic-title">ดูข้อมูลเพิ่มเติม</h4>
+    <button type="button" class="btn btn-close" style="color: aliceblue" aria-label="Close"
+      (click)="modal.dismiss('Cross click')">
+      <i class="fa-solid fa-x"></i>
+    </button>
+  </div>
+  <div class="modal-body">
+    <table class="table table-bordered">
+      <tr>
+        <th>ชื่อ หน่วยงาน</th>
+        <td>{{ agencyDataPaging.datas[indexForView].abbreviationName }}</td>
+      </tr>
+      <tr>
+        <th>ชื่อย่อ หน่วยงาน</th>
+        <td>{{ agencyDataPaging.datas[indexForView].agencyName }}</td>
+      </tr>
+      <tr>
+        <th>รหัส หน่วยงาน</th>
+        <td>{{ agencyDataPaging.datas[indexForView].agencyCode }}</td>
+      </tr>
+      <tr>
+        <th>วันที่เพิ่มเข้าระบบ</th>
+        <td>{{ agencyDataPaging.datas[indexForView].createdAt }}</td>
+      </tr>
+      <tr>
+        <th>หน่วยงานย่อย</th>
+        <div *ngFor="let item of agencyDataPaging.datas[indexForView].agencySecondaryLists">
+          <td style="border: none; padding: 6px 12px 6px 12px;">- {{item.agencyName}} </td>
+        </div>
+      </tr>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-secondary" (click)="modal.dismiss('Cross click')">ปิด</button>
+  </div>
+</ng-template>

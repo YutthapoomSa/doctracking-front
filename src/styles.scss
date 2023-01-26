@@ -1,0 +1,265 @@
+/* You can add global styles to this file, and also import other style files */
+// @import '~bootstrap/scss/bootstrap';
+
+/* Importing Bootstrap SCSS file. */
+// @import '~bootstrap/scss/bootstrap';
+
+@import url('https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.3.0/css/flag-icon.min.css');
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700');
+
+@import '~admin-lte/plugins/fontawesome-free/css/all.min.css';
+@import '~admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css';
+@import '~admin-lte/dist/css/adminlte.min.css';
+
+@import '~ngx-toastr/toastr';
+
+body {
+    width: 100vw;
+    height: 100vh;
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.user-menu > .nav-link {
+    cursor: pointer;
+}
+
+.user-menu > .nav-link:after {
+    content: none;
+}
+
+.user-menu > .dropdown-menu {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 0;
+    width: 280px;
+}
+
+.user-menu > .dropdown-menu,
+.user-menu > .dropdown-menu > .user-body {
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.user-menu > .dropdown-menu > li.user-header {
+    height: 175px;
+    padding: 10px;
+    text-align: center;
+}
+
+.user-menu > .dropdown-menu > li.user-header > img {
+    z-index: 5;
+    height: 90px;
+    width: 90px;
+    border: 3px solid;
+    border-color: transparent;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.user-menu > .dropdown-menu > li.user-header > p {
+    z-index: 5;
+    font-size: 17px;
+    margin-top: 10px;
+}
+
+.user-menu > .dropdown-menu > li.user-header > p > small {
+    display: block;
+    font-size: 12px;
+}
+
+.user-menu > .dropdown-menu > .user-body {
+    border-bottom: 1px solid #495057;
+    border-top: 1px solid #dee2e6;
+    padding: 15px;
+}
+
+.user-menu > .dropdown-menu > .user-body::after {
+    display: block;
+    clear: both;
+    content: '';
+}
+
+@media (min-width: 576px) {
+    .user-menu > .dropdown-menu > .user-body a {
+        background: #ffffff !important;
+        color: #495057 !important;
+    }
+}
+
+.user-menu > .dropdown-menu > .user-footer {
+    background-color: #f8f9fa;
+    padding: 10px;
+}
+
+.user-menu > .dropdown-menu > .user-footer::after {
+    display: block;
+    clear: both;
+    content: '';
+}
+
+.user-menu > .dropdown-menu > .user-footer .btn-default {
+    color: #6c757d;
+}
+
+@media (min-width: 576px) {
+    .user-menu > .dropdown-menu > .user-footer .btn-default:hover {
+        background-color: #f8f9fa;
+    }
+}
+
+.user-menu .user-image {
+    border-radius: 50%;
+    float: left;
+    height: 2.1rem;
+    margin-right: 10px;
+    margin-top: -2px;
+    width: 2.1rem;
+}
+
+@media (min-width: 576px) {
+    .user-menu .user-image {
+        float: none;
+        line-height: 10px;
+        margin-right: 0.4rem;
+        margin-top: -8px;
+    }
+}
+
+.user-menu .user-image {
+    height: 1.6rem;
+    width: 1.6rem;
+    margin-right: 0;
+    margin-left: -8px;
+}
+
+.content {
+    padding: 0 0.5rem;
+}
+
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+
+.bg-g-primary {
+    color: white;
+    background: linear-gradient(65deg, #0069d9 35%, #017bff 35% 65%) !important;
+    // background: linear-gradient(45deg, #4c71ba 35%, #07b6f0 35% 65%) !important;
+}
+.bg-g-success {
+    color: white;
+    background: linear-gradient(65deg, #238d3b 35%, #28a645 35% 65%) !important;
+}
+.bg-g-danger {
+    color: white;
+    background: linear-gradient(65deg, #bb2d3b 35%, #dc3545 35% 65%) !important;
+}
+.bg-g-warning {
+    color: white;
+    background: linear-gradient(65deg, #e7ad00 35%, #ffc107 35% 65%) !important;
+}
+
+.bg-g-secondary {
+    color: white;
+    background: linear-gradient(65deg, #6c757d 35%, #868e96 35% 65%) !important;
+}
+.nav-link.active {
+    background-color: #8c1f78 !important;
+    //   background: rgb(2,0,36);
+    // background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(140,31,120,1) 87%, rgba(255,255,255,1) 100%);
+}
+.bg-teal {
+    background-color: #8c1f78 !important;
+}
+
+.login-page {
+    // background-color: #8C1F78 !important;
+    // background-color: rgb(2,0,36) !important;
+    // background-image: linear-gradient(180deg, red, yellow) !important;
+    // }
+    background-image: linear-gradient(0deg, rgba(2, 0, 36, 1) 0%, rgba(140, 31, 120, 1) 0%, rgba(255, 255, 255, 1) 100%) !important;
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.flex-center-vertical {
+    display: flex;
+    align-items: center;
+}
+.custom-add-btn {
+    background-color: #8c1f78 !important;
+    border-color: #8c1f78 !important;
+    color: white;
+}
+.bg-custom-add {
+    color: white;
+    background: rgb(140, 31, 120);
+    background: linear-gradient(60deg, rgba(140, 31, 120, 1) 50%, rgba(167, 54, 147, 1) 50%);
+}
+.bg-custom-edit {
+    color: white;
+    background: rgb(128, 196, 35);
+    background: linear-gradient(60deg, rgba(128, 196, 35, 1) 50%, rgba(172, 226, 98, 1) 50%);
+}
+.bg-custom-view {
+    color: white;
+    background: rgb(85, 145, 245);
+    background: linear-gradient(60deg, rgba(85, 145, 245, 1) 50%, rgba(125, 169, 241, 1) 50%);
+}
+.custom-edit-btn {
+    background-color: #80c423 !important;
+    border-color: #80c423 !important;
+    color: white;
+}
+.custom-info-btn {
+    background-color: #5591f5 !important;
+    border-color: #5591f5 !important;
+    color: white;
+}
+.error {
+    color: red;
+}
+.input-error {
+    border: red 1px solid !important;
+}
+.f-12 {
+    font-size: 12px;
+}
+.btn-close {
+    color: white;
+}
+
+.alert {
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+.input-group-append {
+    position: absolute;
+    top: 0px;
+    right: 15px;
+}
+
+.small-box {
+    cursor: pointer;
+    height: 100%;
+}
+
+.description-box {
+    position: absolute !important;
+    left: 0px;
+    width: 100%;
+    bottom: 0px;
+}
+
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+
+.label {
+    color: #000000 !important;
+}

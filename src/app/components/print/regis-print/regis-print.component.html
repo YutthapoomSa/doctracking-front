@@ -1,0 +1,37 @@
+<table class="table table-bordered text-center">
+  <thead>
+    <tr class="">
+      <th scope="col" colspan="9" class="text-center" style="font-size: 36px">ทะเบียน รับ-ส่ง หนังสือ</th>
+    </tr>
+    <tr>
+      <th scope=" col">วันเดือนปี</th>
+      <th scope="col">เลขที่รับหนังสือ</th>
+      <th scope="col">เลขที่หนังสือ</th>
+      <th scope="col">วันที่หนังสือ</th>
+      <th scope="col">จาก</th>
+      <th scope="col">ถึง</th>
+      <th scope="col">เรื่อง</th>
+      <th scope="col">การปฏิบัติ</th>
+      <th scope="col" class="text-center">ผู้รับหนังสือ</th>
+    </tr>
+  </thead>
+  <tbody>
+    <ng-container *ngIf="resFindOneDocumentArray.resData.length > 0">
+      <tr *ngFor="let item of resFindOneDocumentArray.resData; let i = index">
+        <td scope="col">{{ item.createdAt | dateOnlyFormat }}</td>
+        <td scope="col">{{ item.docNo }}</td>
+        <td scope="col">{{ item.governmentDocNo }}</td>
+        <td scope="col">-</td>
+        <td scope="col">{{ item.formDoc }}</td>
+        <td scope="col">{{ item.toDoc }}</td>
+        <td scope="col">{{ item.name }}</td>
+        <td scope="col">การปฏิบัติ</td>
+        <td scope="col" class="text-center">
+          <!-- <button class="btn btn-primary btn-sm ml-2">
+            <i class="fas fa-business-time"></i>
+          </button> -->
+        </td>
+      </tr>
+    </ng-container>
+  </tbody>
+</table>

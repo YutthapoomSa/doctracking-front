@@ -1,0 +1,70 @@
+.custom-add-btn {
+    background-color: #8c1f78 !important;
+    border-color: #8c1f78 !important;
+    color: white;
+}
+.bg-custom-add {
+    color: white;
+    background: rgb(140, 31, 120);
+    background: linear-gradient(60deg, rgba(140, 31, 120, 1) 50%, rgba(167, 54, 147, 1) 50%);
+}
+.bg-custom-edit {
+    color: white;
+    background: rgb(128, 196, 35);
+    background: linear-gradient(60deg, rgba(128, 196, 35, 1) 50%, rgba(172, 226, 98, 1) 50%);
+}
+.bg-custom-view {
+    color: white;
+    background: rgb(85, 145, 245);
+    background: linear-gradient(60deg, rgba(85, 145, 245, 1) 50%, rgba(125, 169, 241, 1) 50%);
+}
+.custom-edit-btn {
+    background-color: #80c423 !important;
+    border-color: #80c423 !important;
+    color: white;
+}
+
+.custom-danger-btn {
+  background-color: red !important;
+  border-color: red !important;
+  color: white;
+}
+.custom-info-btn {
+    background-color: #5591f5 !important;
+    border-color: #5591f5 !important;
+    color: white;
+}
+.error {
+    color: red;
+}
+.input-error {
+    border: red 1px solid !important;
+}
+.f-12 {
+    font-size: 12px;
+}
+
+// paging
+a.page-item.active .page-link {
+    color: #fff !important;
+    background-color: #8c1f78 !important;
+    border-color: #8c1f78 !important;
+}
+
+a.page-link {
+    z-index: 3 !important;
+    color: #fff !important;
+    background-color: #8c1f78 !important;
+    border-color: #8c1f78 !important;
+}
+
+.header-secondary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+hr .custom-hr {
+    // border-top: 1px solid #f9f8f8;
+    border-top: 1px solid #eaecee;
+}

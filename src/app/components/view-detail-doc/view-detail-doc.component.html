@@ -1,0 +1,111 @@
+<div class="container-fluid">
+  <ng-container *ngIf="data">
+    <table class="table table-bordered">
+      <tr>
+        <th class="th-1">หมายเลขเอกสาร</th>
+        <td>{{ data.governmentDocNo }}</td>
+      </tr>
+      <tr>
+        <th class="th-1">หัวเรื่อง</th>
+        <td>{{ data.name }}</td>
+      </tr>
+      <tr>
+        <th class="th-1">บัญชีผู้นำเข้าระบบ</th>
+        <td>{{ data.user.firstName + ' ' + data.user.lastName }}</td>
+      </tr>
+      <tr>
+        <th class="th-1">ประเภท</th>
+        <td>{{ data.documentType}}</td>
+      </tr>
+      <tr>
+        <th class="th-1">หน่วยงานปลายทาง</th>
+        <!-- <td *ngIf="data.docHistoryLists.length > 0">
+          {{ data.docHistoryLists[0].agencyRecipient.agencyName }}
+        </td>
+        <td *ngIf="data.docHistoryLists.length === 0">-</td> -->
+      </tr>
+      <tr>
+        <th class="th-1">ปี เดือน วัน</th>
+        <td>{{ data.createdAt | dateFormat1}}</td>
+      </tr>
+      <tr>
+        <th class="th-1">ระดับความสำคัญ</th>
+        <td>{{ data.priority }}</td>
+      </tr>
+      <tr>
+        <th class="th-1">หมายเหตุ</th>
+        <td>{{ data.detail }}</td>
+      </tr>
+    </table>
+
+    <div class="row table-responsive p-0 m-0" *ngIf="data.docFileLists && data.docFileLists.length > 0">
+      <table class="table table-bordered">
+        <tr>
+          <th style="width: 5%">#</th>
+          <td style="width: 35%">ชื่อไฟล์</td>
+          <td style="width: 20%">ขนาด</td>
+          <td style="width: 20%">วันที่</td>
+          <td style="width: 20%"></td>
+        </tr>
+        <tr *ngFor="let item of data.docFileLists; let i = index">
+          <th>{{ i + 1 }}</th>
+          <td>{{ item.fileName }}</td>
+          <td>{{ item.fileSize }}</td>
+          <td>{{ item.createdAt | date }}</td>
+          <td>
+            <!-- <a [href]="pdfSrc" target="_blank" class="btn btn-border" download="fileName.pdf">
+              <button class="btn custom-edit-btn btn-sm ml-2">
+                <i class="fas fa-download mr-3"></i>
+              </button>
+            </a> -->
+            <!-- <a [href]="item.fileFullPath" target="_blank" class="btn btn-border" download="fileName.pdf">
+              <button class="btn custom-edit-btn btn-sm ml-2">
+                <i class="fas fa-download mr-3"></i>
+              </button>
+            </a> -->
+            <button class="btn custom-edit-btn btn-sm ml-2" (click)="openViewer(imageShow,item.fileFullPath)">
+              <i class="fas fa-download mr-3"></i>
+            </button>
+          </td>
+        </tr>
+      </table>
+      <!-- <p>{{data.docFileLists[0].fileFullPath | json}}</p> -->
+
+      <!-- <div class="col-3" *ngFor="let item of data.docFileLists">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <img src="assets/img/img-file.png" />
+                        </div>
+                        <div class="col-12 ml-1 mr-1 text-center">
+                            <p>{{ item.fileName }}</p>
+                        </div>
+                        <div class="col-12">
+                            <i class="fas fa-download float-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #imageShow let-modal>
+  <div class="modal-header custom-edit-btn">
+    <h4>
+      ดูรูปภาพ
+    </h4>
+    <button type="button" class="btn btn-close" style="color: aliceblue" aria-label="Close"
+      (click)="modal.dismiss('Cross click')">
+      <i class="fa-solid fa-x"></i>
+    </button>
+  </div>
+  <div class="modal-body">
+    <a class="btn-download-primary" href="{{imageShow}}" download>Download</a>
+    <img class="image-show" [src]="imageShow" onerror="this.src='assets/img/blank-img.jpg'" alt="">
+    <div></div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>
